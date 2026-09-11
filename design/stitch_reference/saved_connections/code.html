@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#0b141c;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { colors: { 'tertiary-fixed': '#ffdeaa', 'on-primary': '#00315c', 'on-error': '#690005', 'on-primary-fixed-variant': '#004882', 'surface-tint': '#a2c9ff', 'inverse-surface': '#dae3ee', 'secondary': '#67df70', 'error-container': '#93000a', 'surface-variant': '#2d363e', 'inverse-on-surface': '#29313a', 'primary': '#a2c9ff', 'background': '#0b141c', 'on-tertiary-fixed': '#271900', 'on-surface': '#dae3ee', 'surface-container': '#182028', 'on-tertiary': '#422c00', 'primary-container': '#58a6ff', 'surface-dim': '#0b141c', 'surface-container-high': '#222b33', 'primary-fixed-dim': '#a2c9ff', 'secondary-fixed-dim': '#67df70', 'on-secondary': '#00390d', 'tertiary': '#fabc45', 'surface-container-lowest': '#060f16', 'on-primary-container': '#003a6b', 'surface': '#0b141c', 'outline': '#8b919d', 'on-secondary-container': '#00320a', 'surface-container-highest': '#2d363e', 'surface-bright': '#313a43', 'on-error-container': '#ffdad6', 'secondary-container': '#27a640', 'on-secondary-fixed': '#002105', 'on-primary-fixed': '#001c38', 'secondary-fixed': '#83fc89', 'tertiary-container': '#d29922', 'primary-fixed': '#d3e4ff', 'on-surface-variant': '#c0c7d4', 'on-tertiary-container': '#4d3500', 'on-secondary-fixed-variant': '#005317', 'on-background': '#dae3ee', 'inverse-primary': '#0060aa', 'surface-container-low': '#141c24', 'error': '#ffb4ab', 'outline-variant': '#414752', 'tertiary-fixed-dim': '#fabc45', 'on-tertiary-fixed-variant': '#5f4100' }, borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' }, spacing: { 'space-2xl': '24px', 'gutter-screen': '12px', 'space-lg': '16px', 'space-3xl': '32px', 'space-xs': '4px', 'space-sm': '8px', 'space-md': '12px', 'gutter-terminal': '8px', 'space-2xs': '2px', 'space-xl': '20px' }, fontFamily: { 'headline-md': ['Geist'], 'code-lg': ['JetBrains Mono'], 'body-md': ['Geist'], 'headline-lg': ['Geist'], 'body-lg': ['Geist'], 'label-sm': ['JetBrains Mono'], 'code-md': ['JetBrains Mono'], 'label-md': ['Geist'], 'headline-sm': ['Geist'], 'body-sm': ['Geist'], 'code-sm': ['JetBrains Mono'] }, fontSize: { 'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.015em', fontWeight: '600' }], 'code-lg': ['13px', { lineHeight: '18px', letterSpacing: '-0.01em', fontWeight: '500' }], 'body-md': ['13px', { lineHeight: '18px', letterSpacing: '0em', fontWeight: '400' }], 'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '600' }], 'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0em', fontWeight: '400' }], 'label-sm': ['10px', { lineHeight: '12px', letterSpacing: '0.05em', fontWeight: '600' }], 'code-md': ['12px', { lineHeight: '16px', letterSpacing: '0em', fontWeight: '400' }], 'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '500' }], 'headline-sm': ['16px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '600' }], 'body-sm': ['12px', { lineHeight: '16px', letterSpacing: '0em', fontWeight: '400' }], 'code-sm': ['11px', { lineHeight: '14px', letterSpacing: '0em', fontWeight: '400' }] } } } }</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-16 px-gutter-screen flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm shrink-0"><img alt="ServerKit Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VcpmL3yYjtsvMmuybnD75BRvf4lTSUiHHVrQufBuiOgJQTwyvnJgM94VQG2knGjzhrFgI6BSc9InW3d_dikAv2n7f6-RLtAl5u7-jRD2Xr_9im6BQLFPMbUQc831kqODdETMlUebIM3Vl0cA_zUcJmnT14t_wjsDPKJnwzfNmAxWxMFrie-bw_oikndkbdnT9R5cfU_Zyley5zskgKuKL1b9Atl4uYJGwIiUx04O63uRYH_ts5YFIe_A"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">ServerKit</span><span class="font-code-sm text-code-sm text-on-surface-variant truncate max-w-[80px]">Files</span></div></div><div class="flex-1 flex justify-center min-w-0 px-space-xs"><button class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-1 rounded-lg max-w-full" type="button"><span class="w-2 h-2 rounded-full bg-secondary shrink-0 shadow-[0_0_6px_#67df70]"></span><span class="font-code-sm text-code-sm text-on-surface truncate">prod-api-01 • example.com</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant shrink-0">expand_more</span></button></div><div class="flex items-center gap-space-2xs shrink-0"><button aria-label="Transfers" class="relative w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[20px]">sync_alt</span><span class="absolute top-2 right-2 flex items-center justify-center min-w-[15px] h-[15px] px-1 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">2</span></button><button aria-label="Connections Drawer" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[22px]">dns</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-2xs shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface flex-1 min-h-screen"><div class="flex flex-col w-full px-gutter-screen space-y-space-md">
+<!-- Security Vault Indicator -->
+<div class="flex items-center justify-between bg-surface-container-low px-space-md py-space-xs rounded-lg mt-space-sm shadow-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[14px] text-secondary shrink-0" style="font-variation-settings: 'FILL' 1;">shield_lock</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate">Encrypted on-device (AES-256-GCM) • Zero Cloud Sync</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest shrink-0 ml-space-xs">SECURE</span>
+</div>
+<!-- Header Action & Overview Stats Bento -->
+<div class="grid grid-cols-3 gap-space-xs">
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Profiles</span>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="font-headline-sm text-headline-sm text-on-surface leading-none">3</span>
+<span class="font-code-sm text-code-sm text-secondary">/ 10</span>
+</div>
+</div>
+<div class="bg-surface-container p-space-sm rounded-lg flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Online</span>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="font-headline-sm text-headline-sm text-secondary leading-none">1</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">live</span>
+</div>
+</div>
+<button class="bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container p-space-sm rounded-lg flex flex-col justify-between items-start transition-colors" id="btn-add-profile" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span class="font-headline-sm text-headline-sm leading-none mt-1">+ New</span>
+</button>
+</div>
+<!-- Search & Tag Filter Bar -->
+<div class="flex flex-col gap-space-xs">
+<div class="relative w-full flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-[18px] text-outline pointer-events-none">search</span>
+<input class="w-full h-9 pl-9 pr-8 bg-surface-container-low text-on-surface placeholder:text-outline font-code-md text-code-md rounded-lg focus:bg-surface-container-high focus:outline-none transition-colors" id="filter-input" placeholder="Filter host, ip, tags (e.g. prod, aws)..." type="text"/>
+<button class="absolute right-2.5 text-outline hover:text-on-surface hidden" id="clear-search" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Filter Tags Slider -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-0.5 no-scrollbar">
+<button class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0 font-medium">All (3)</button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface-variant px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0">PROD</button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface-variant px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0">STAGING</button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface-variant px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0">CLIENT</button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface-variant px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0">AWS</button>
+<button class="bg-surface-container-high hover:bg-surface-bright text-on-surface-variant px-2 py-0.5 rounded font-code-sm text-code-sm shrink-0">HETZNER</button>
+</div>
+</div>
+<!-- Connections List -->
+<div class="flex flex-col space-y-space-sm" id="connection-list">
+<!-- SERVER 1: Active Production Node -->
+<div class="bg-surface-container rounded-lg p-space-md flex flex-col space-y-space-sm relative overflow-hidden shadow-md group" data-profile="prod-api-01">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary shadow-[0_0_8px_#67df70]"></div>
+<!-- Top Title Line -->
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary shrink-0 shadow-[0_0_6px_#67df70] animate-pulse"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">prod-api-01</h2>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase font-semibold">Active</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 bg-surface-container-high px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[13px] text-secondary">wifi</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">42ms</span>
+</div>
+</div>
+<!-- Endpoint Telemetry -->
+<div class="flex flex-col space-y-0.5 bg-surface-container-low p-space-xs rounded font-code-md text-code-md">
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-primary truncate">api.production.internal</span>
+<span class="text-on-surface-variant font-code-sm text-code-sm shrink-0">: 22 • 443</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-code-sm text-code-sm">
+<span>SSH/SFTP (ed25519)</span>
+<span>•</span>
+<span>HTTPS Reverse Proxy</span>
+</div>
+</div>
+<!-- Metadata Tags -->
+<div class="flex items-center flex-wrap gap-1">
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">PROD</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">AWS us-east-1</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">UBUNTU 24.04</span>
+</div>
+<!-- Quick Action Palette -->
+<div class="grid grid-cols-4 gap-space-xs pt-space-xs">
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-primary flex items-center justify-center gap-1 rounded transition-colors" title="Launch Terminal" type="button">
+<span class="material-symbols-outlined text-[15px]">terminal</span>
+<span class="font-code-sm text-code-sm font-medium">SSH</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Browse SFTP Files" type="button">
+<span class="material-symbols-outlined text-[15px]">folder_open</span>
+<span class="font-code-sm text-code-sm">Files</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Inspect Web Surface" type="button">
+<span class="material-symbols-outlined text-[15px]">language</span>
+<span class="font-code-sm text-code-sm">Web</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface-variant flex items-center justify-center rounded transition-colors" title="Manage Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- SERVER 2: Staging Hetzner Worker -->
+<div class="bg-surface-container rounded-lg p-space-md flex flex-col space-y-space-sm relative overflow-hidden shadow-sm group" data-profile="staging-worker">
+<!-- Top Title Line -->
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-outline shrink-0"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">staging-worker</h2>
+<span class="bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">Idle</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0 bg-surface-container-high px-2 py-0.5 rounded">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Ready</span>
+</div>
+</div>
+<!-- Endpoint Telemetry -->
+<div class="flex flex-col space-y-0.5 bg-surface-container-low p-space-xs rounded font-code-md text-code-md">
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-primary truncate">10.0.4.15</span>
+<span class="text-on-surface-variant font-code-sm text-code-sm shrink-0">: 2222</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-code-sm text-code-sm">
+<span>Auth: id_ed25519_worker</span>
+<span>•</span>
+<span>user: deploy</span>
+</div>
+</div>
+<!-- Metadata Tags -->
+<div class="flex items-center flex-wrap gap-1">
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">STAGING</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">HETZNER nbg1</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">DOCKER</span>
+</div>
+<!-- Quick Action Palette -->
+<div class="grid grid-cols-4 gap-space-xs pt-space-xs">
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Launch Terminal" type="button">
+<span class="material-symbols-outlined text-[15px]">terminal</span>
+<span class="font-code-sm text-code-sm font-medium">SSH</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Browse SFTP Files" type="button">
+<span class="material-symbols-outlined text-[15px]">folder_open</span>
+<span class="font-code-sm text-code-sm">Files</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Inspect Web Surface" type="button">
+<span class="material-symbols-outlined text-[15px]">language</span>
+<span class="font-code-sm text-code-sm">Web</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface-variant flex items-center justify-center rounded transition-colors" title="Manage Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- SERVER 3: Legacy Client WordPress (Warning FTP) -->
+<div class="bg-surface-container rounded-lg p-space-md flex flex-col space-y-space-sm relative overflow-hidden shadow-sm group" data-profile="client-wordpress-live">
+<!-- Top Title Line -->
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary shrink-0 shadow-[0_0_6px_#fabc45]"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">client-wordpress-live</h2>
+</div>
+<div class="flex items-center gap-1 shrink-0 bg-error-container text-on-error-container px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-[13px]">lock_open</span>
+<span class="font-code-sm text-code-sm font-medium">Insecure FTP</span>
+</div>
+</div>
+<!-- Endpoint Telemetry -->
+<div class="flex flex-col space-y-0.5 bg-surface-container-low p-space-xs rounded font-code-md text-code-md">
+<div class="flex items-center justify-between text-on-surface">
+<span class="text-primary truncate">sftp.clientdomain.com</span>
+<span class="text-error font-code-sm text-code-sm shrink-0">: 21 (Plaintext)</span>
+</div>
+<div class="flex items-center gap-space-xs text-on-surface-variant font-code-sm text-code-sm">
+<span>Auth: Password (Saved Keychain)</span>
+<span>•</span>
+<span>No SSH Daemon</span>
+</div>
+</div>
+<!-- Metadata Tags -->
+<div class="flex items-center flex-wrap gap-1">
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">CLIENT</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">cPanel</span>
+<span class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-1.5 py-0.5 rounded uppercase">LEGACY</span>
+</div>
+<!-- Quick Action Palette (SSH Disabled) -->
+<div class="grid grid-cols-4 gap-space-xs pt-space-xs">
+<button class="h-8 bg-surface-container-low text-outline opacity-40 flex items-center justify-center gap-1 rounded cursor-not-allowed" disabled="" title="SSH Protocol Not Exposed" type="button">
+<span class="material-symbols-outlined text-[15px]">block</span>
+<span class="font-code-sm text-code-sm">SSH</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Browse FTP Files" type="button">
+<span class="material-symbols-outlined text-[15px]">folder_open</span>
+<span class="font-code-sm text-code-sm">Files</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface flex items-center justify-center gap-1 rounded transition-colors" title="Inspect Web Preview" type="button">
+<span class="material-symbols-outlined text-[15px]">language</span>
+<span class="font-code-sm text-code-sm">Web</span>
+</button>
+<button class="h-8 bg-surface-container-high hover:bg-surface-bright text-on-surface-variant flex items-center justify-center rounded transition-colors" title="Manage Profile" type="button">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Quick Connect Trigger Card (Ephemeral / Unsaved) -->
+<div class="bg-surface-container-low p-space-md rounded-lg flex flex-col space-y-space-sm mt-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[18px]">flash_on</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Quick Connect</h3>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant px-1.5 py-0.5 rounded">NO KEYCHAIN STORAGE</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+      Spin up an isolated single-session SSH or SFTP connection without retaining credentials or identity history.
+    </p>
+<button class="w-full h-9 bg-surface-container-high hover:bg-surface-bright active:bg-surface-container-highest text-on-surface flex items-center justify-center gap-space-xs rounded font-label-md text-label-md transition-colors" id="btn-open-quick-connect" type="button">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+<span>Open Ephemeral Session Form</span>
+</button>
+</div>
+<!-- Quick Connect Bottom Drawer Sheet (Interactive) -->
+<div class="fixed inset-x-0 bottom-0 z-50 bg-surface-container-high rounded-t-xl p-space-lg shadow-2xl transition-transform duration-300 ease-out translate-y-full max-w-lg mx-auto" id="quick-sheet">
+<!-- Sheet Drag Handle -->
+<div class="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-space-md"></div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[20px] text-primary">bolt</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Ephemeral SSH/SFTP</h3>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1" id="btn-close-quick-connect" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<form class="space-y-space-sm" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-3 gap-space-xs">
+<div class="col-span-2 flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">TARGET HOST / IP</label>
+<input class="h-9 px-space-sm bg-surface-container-lowest text-on-surface font-code-md text-code-md rounded focus:outline-none" placeholder="192.168.1.100" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">PORT</label>
+<input class="h-9 px-space-sm bg-surface-container-lowest text-on-surface font-code-md text-code-md rounded focus:outline-none" type="number" value="22"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-xs">
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">USER</label>
+<input class="h-9 px-space-sm bg-surface-container-lowest text-on-surface font-code-md text-code-md rounded focus:outline-none" placeholder="root" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant">PROTOCOL</label>
+<select class="h-9 px-space-sm bg-surface-container-lowest text-on-surface font-code-md text-code-md rounded focus:outline-none">
+<option>SSH Terminal</option>
+<option>SFTP Browser</option>
+</select>
+</div>
+</div>
+<div class="pt-space-xs flex gap-space-sm">
+<button class="flex-1 h-9 bg-primary hover:bg-primary-container text-on-primary hover:text-on-primary-container font-label-md text-label-md rounded flex items-center justify-center gap-1 transition-colors" id="btn-launch-ephemeral" type="button">
+<span class="material-symbols-outlined text-[16px]">rocket_launch</span>
+<span>Connect Now</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Backdrop for Sheet -->
+<div class="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs hidden transition-opacity" id="sheet-backdrop"></div>
+</div>
+<script>
+  // Filter input dynamic interaction
+  const searchInput = document.getElementById('filter-input');
+  const clearBtn = document.getElementById('clear-search');
+  const serverCards = document.querySelectorAll('#connection-list > div');
+
+  searchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    clearBtn.classList.toggle('hidden', term.length === 0);
+    
+    serverCards.forEach((card) => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = text.includes(term) ? 'flex' : 'none';
+    });
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    clearBtn.classList.add('hidden');
+    serverCards.forEach(c => c.style.display = 'flex');
+    searchInput.focus();
+  });
+
+  // Quick Connect Bottom Sheet Trigger
+  const quickSheet = document.getElementById('quick-sheet');
+  const sheetBackdrop = document.getElementById('sheet-backdrop');
+  const openQuickBtn = document.getElementById('btn-open-quick-connect');
+  const closeQuickBtn = document.getElementById('btn-close-quick-connect');
+  const launchBtn = document.getElementById('btn-launch-ephemeral');
+
+  function openSheet() {
+    sheetBackdrop.classList.remove('hidden');
+    setTimeout(() => {
+      quickSheet.classList.remove('translate-y-full');
+    }, 10);
+  }
+
+  function closeSheet() {
+    quickSheet.classList.add('translate-y-full');
+    setTimeout(() => {
+      sheetBackdrop.classList.add('hidden');
+    }, 280);
+  }
+
+  openQuickBtn.addEventListener('click', openSheet);
+  closeQuickBtn.addEventListener('click', closeSheet);
+  sheetBackdrop.addEventListener('click', closeSheet);
+  launchBtn.addEventListener('click', () => {
+    closeSheet();
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container/95 backdrop-blur-xl shadow-[0_-1px_12px_rgba(0,0,0,0.5)]" data-active-classes="text-primary font-bold"><div class="h-16 px-space-xs flex items-stretch justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[48px] px-space-xs transition-colors text-primary font-bold" data-path="files" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">folder</span><span class="font-label-sm text-label-sm uppercase tracking-wider">FILES</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="terminal" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">terminal</span><span class="font-label-sm text-label-sm uppercase tracking-wider">TERMINAL</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="web-preview" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">language</span><span class="font-label-sm text-label-sm uppercase tracking-wider">WEB</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="transfers" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">swap_vert</span><span class="font-label-sm text-label-sm uppercase tracking-wider">TRANSFERS</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">tune</span><span class="font-label-sm text-label-sm uppercase tracking-wider">SETTINGS</span></a></div></nav></body></html>

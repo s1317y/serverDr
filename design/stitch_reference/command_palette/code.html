@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#0b141c;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { colors: { 'tertiary-fixed': '#ffdeaa', 'on-primary': '#00315c', 'on-error': '#690005', 'on-primary-fixed-variant': '#004882', 'surface-tint': '#a2c9ff', 'inverse-surface': '#dae3ee', 'secondary': '#67df70', 'error-container': '#93000a', 'surface-variant': '#2d363e', 'inverse-on-surface': '#29313a', 'primary': '#a2c9ff', 'background': '#0b141c', 'on-tertiary-fixed': '#271900', 'on-surface': '#dae3ee', 'surface-container': '#182028', 'on-tertiary': '#422c00', 'primary-container': '#58a6ff', 'surface-dim': '#0b141c', 'surface-container-high': '#222b33', 'primary-fixed-dim': '#a2c9ff', 'secondary-fixed-dim': '#67df70', 'on-secondary': '#00390d', 'tertiary': '#fabc45', 'surface-container-lowest': '#060f16', 'on-primary-container': '#003a6b', 'surface': '#0b141c', 'outline': '#8b919d', 'on-secondary-container': '#00320a', 'surface-container-highest': '#2d363e', 'surface-bright': '#313a43', 'on-error-container': '#ffdad6', 'secondary-container': '#27a640', 'on-secondary-fixed': '#002105', 'on-primary-fixed': '#001c38', 'secondary-fixed': '#83fc89', 'tertiary-container': '#d29922', 'primary-fixed': '#d3e4ff', 'on-surface-variant': '#c0c7d4', 'on-tertiary-container': '#4d3500', 'on-secondary-fixed-variant': '#005317', 'on-background': '#dae3ee', 'inverse-primary': '#0060aa', 'surface-container-low': '#141c24', 'error': '#ffb4ab', 'outline-variant': '#414752', 'tertiary-fixed-dim': '#fabc45', 'on-tertiary-fixed-variant': '#5f4100' }, borderRadius: { 'DEFAULT': '0.125rem', 'lg': '0.25rem', 'xl': '0.5rem', 'full': '0.75rem' }, spacing: { 'space-2xl': '24px', 'gutter-screen': '12px', 'space-lg': '16px', 'space-3xl': '32px', 'space-xs': '4px', 'space-sm': '8px', 'space-md': '12px', 'gutter-terminal': '8px', 'space-2xs': '2px', 'space-xl': '20px' }, fontFamily: { 'headline-md': ['Geist'], 'code-lg': ['JetBrains Mono'], 'body-md': ['Geist'], 'headline-lg': ['Geist'], 'body-lg': ['Geist'], 'label-sm': ['JetBrains Mono'], 'code-md': ['JetBrains Mono'], 'label-md': ['Geist'], 'headline-sm': ['Geist'], 'body-sm': ['Geist'], 'code-sm': ['JetBrains Mono'] }, fontSize: { 'headline-md': ['20px', { lineHeight: '28px', letterSpacing: '-0.015em', fontWeight: '600' }], 'code-lg': ['13px', { lineHeight: '18px', letterSpacing: '-0.01em', fontWeight: '500' }], 'body-md': ['13px', { lineHeight: '18px', letterSpacing: '0em', fontWeight: '400' }], 'headline-lg': ['24px', { lineHeight: '32px', letterSpacing: '-0.02em', fontWeight: '600' }], 'body-lg': ['15px', { lineHeight: '22px', letterSpacing: '0em', fontWeight: '400' }], 'label-sm': ['10px', { lineHeight: '12px', letterSpacing: '0.05em', fontWeight: '600' }], 'code-md': ['12px', { lineHeight: '16px', letterSpacing: '0em', fontWeight: '400' }], 'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '500' }], 'headline-sm': ['16px', { lineHeight: '24px', letterSpacing: '-0.01em', fontWeight: '600' }], 'body-sm': ['12px', { lineHeight: '16px', letterSpacing: '0em', fontWeight: '400' }], 'code-sm': ['11px', { lineHeight: '14px', letterSpacing: '0em', fontWeight: '400' }] } } } }</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-container/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-16 px-gutter-screen flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm shrink-0"><img alt="ServerKit Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VcpmL3yYjtsvMmuybnD75BRvf4lTSUiHHVrQufBuiOgJQTwyvnJgM94VQG2knGjzhrFgI6BSc9InW3d_dikAv2n7f6-RLtAl5u7-jRD2Xr_9im6BQLFPMbUQc831kqODdETMlUebIM3Vl0cA_zUcJmnT14t_wjsDPKJnwzfNmAxWxMFrie-bw_oikndkbdnT9R5cfU_Zyley5zskgKuKL1b9Atl4uYJGwIiUx04O63uRYH_ts5YFIe_A"/><div class="flex flex-col"><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface leading-none">ServerKit</span><span class="font-code-sm text-code-sm text-on-surface-variant truncate max-w-[80px]">Files</span></div></div><div class="flex-1 flex justify-center min-w-0 px-space-xs"><button class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-1 rounded-lg max-w-full" type="button"><span class="w-2 h-2 rounded-full bg-secondary shrink-0 shadow-[0_0_6px_#67df70]"></span><span class="font-code-sm text-code-sm text-on-surface truncate">prod-api-01 • example.com</span><span class="material-symbols-outlined text-[16px] text-on-surface-variant shrink-0">expand_more</span></button></div><div class="flex items-center gap-space-2xs shrink-0"><button aria-label="Transfers" class="relative w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[20px]">sync_alt</span><span class="absolute top-2 right-2 flex items-center justify-center min-w-[15px] h-[15px] px-1 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">2</span></button><button aria-label="Connections Drawer" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[22px]">dns</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-2xs shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface flex-1 min-h-screen"><div class="flex flex-col w-full px-gutter-screen space-y-space-md">
+<!-- Target Context & Search Bar -->
+<div class="flex flex-col space-y-space-xs pt-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#67df70]"></span>
+<span class="font-code-sm text-code-sm text-secondary font-bold">TERMINAL ATTACHED</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">prod-api-01</span>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary px-2 py-0.5 rounded bg-surface-container-high">⌘K PALETTE</span>
+</div>
+<div class="relative flex items-center w-full">
+<div class="absolute left-3 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</div>
+<input class="w-full h-11 pl-10 pr-10 bg-surface-container-lowest text-on-surface placeholder:text-outline font-code-md text-code-md rounded-lg shadow-sm focus:outline-none focus:bg-surface-container-low transition-colors" id="snippet-search" placeholder="Search 48 server snippets or commands..." type="text"/>
+<button aria-label="Clear filter" class="absolute right-2.5 w-6 h-6 rounded flex items-center justify-center text-outline hover:text-on-surface transition-colors" id="clear-search" type="button">
+<span class="material-symbols-outlined text-[16px]">backspace</span>
+</button>
+</div>
+</div>
+<!-- Category Pills / Horizontal Scrolling Tags -->
+<div class="overflow-x-auto -mx-gutter-screen px-gutter-screen scrollbar-none py-1">
+<div class="flex items-center space-x-space-xs min-w-max" id="category-pills">
+<button class="cat-pill active px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-primary text-on-primary shadow-sm transition-all" data-cat="all" type="button">
+<span>All</span>
+<span class="font-code-sm text-code-sm bg-on-primary/20 px-1 rounded">48</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="docker" type="button">
+<span class="material-symbols-outlined text-[14px]">view_in_ar</span>
+<span>Docker</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">12</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="services" type="button">
+<span class="material-symbols-outlined text-[14px]">settings_suggest</span>
+<span>Systemd / Services</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">9</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="network" type="button">
+<span class="material-symbols-outlined text-[14px]">hub</span>
+<span>Network</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">8</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="web" type="button">
+<span class="material-symbols-outlined text-[14px]">public</span>
+<span>Nginx/Apache</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">6</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="logs" type="button">
+<span class="material-symbols-outlined text-[14px]">segment</span>
+<span>Disk / Logs</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">7</span>
+</button>
+<button class="cat-pill px-3 py-1.5 rounded-lg font-label-md text-label-md flex items-center space-x-1.5 bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-all" data-cat="processes" type="button">
+<span class="material-symbols-outlined text-[14px]">memory</span>
+<span>Processes</span>
+<span class="font-code-sm text-code-sm bg-surface-container-highest px-1 rounded text-outline">6</span>
+</button>
+</div>
+</div>
+<!-- Notification Toast (Ephemeral Micro-interaction) -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-secondary-container text-on-secondary-container px-3 py-1.5 rounded-lg shadow-xl font-code-sm text-code-sm flex items-center space-x-2 opacity-0 pointer-events-none transition-opacity duration-200" id="toast-notify">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span id="toast-text">Command piped to PTY</span>
+</div>
+<!-- Command Cards Feed -->
+<div class="flex flex-col space-y-space-sm" id="snippets-list">
+<!-- Item 1: Docker ps -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-sm flex flex-col space-y-space-xs" data-category="docker">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-surface-container-high text-primary font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase">Docker</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">List running containers with table</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">#read-only</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between group">
+<code class="font-code-md text-code-md text-primary truncate mr-2 select-all">docker ps --format table</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-outline text-[14px]">schedule</span>
+<span class="font-code-sm text-code-sm text-outline">Avg runtime: 120ms</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Insert</span>
+</button>
+<button class="exec-btn h-8 px-3 rounded-lg bg-primary text-on-primary hover:opacity-95 font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span>Execute</span>
+<span class="font-code-sm text-code-sm">↵</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 2: Systemctl restart nginx -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-sm flex flex-col space-y-space-xs" data-category="services web">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-surface-container-high text-tertiary font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase">Services</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Gracefully restart Nginx web service</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-code-sm">sudo</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between">
+<code class="font-code-md text-code-md text-on-surface truncate mr-2 select-all">systemctl restart nginx</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center space-x-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">Active Target: nginx.service</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Insert</span>
+</button>
+<button class="exec-btn h-8 px-3 rounded-lg bg-primary text-on-primary hover:opacity-95 font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span>Execute</span>
+<span class="font-code-sm text-code-sm">↵</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 3: Tail syslog with grep -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-sm flex flex-col space-y-space-xs" data-category="logs">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-surface-container-high text-secondary font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase">Logs</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Stream error logs in real-time</span>
+</div>
+<span class="flex items-center space-x-1 text-secondary font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[14px]">stream</span>
+<span>pipe</span>
+</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between">
+<code class="font-code-md text-code-md text-primary truncate mr-2 select-all">tail -f -n 100 /var/log/syslog | grep error</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-code-sm text-code-sm text-outline truncate max-w-[140px]">Interactive process (^C to end)</span>
+<div class="flex items-center space-x-2">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Insert</span>
+</button>
+<button class="exec-btn h-8 px-3 rounded-lg bg-primary text-on-primary hover:opacity-95 font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span>Execute</span>
+<span class="font-code-sm text-code-sm">↵</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 4: Check disk partitions -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-sm flex flex-col space-y-space-xs" data-category="logs">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase">Disk</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Check partitions &amp; free space</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">fs-stats</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between">
+<code class="font-code-md text-code-md text-on-surface truncate mr-2 select-all">df -hT --exclude-type=tmpfs</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center space-x-2">
+<span class="font-code-sm text-code-sm text-on-surface-variant">NVMe /dev/nvme0n1p1: <span class="text-secondary font-bold">42% free</span></span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Insert</span>
+</button>
+<button class="exec-btn h-8 px-3 rounded-lg bg-primary text-on-primary hover:opacity-95 font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span>Execute</span>
+<span class="font-code-sm text-code-sm">↵</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 5: Journalctl docker -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-sm flex flex-col space-y-space-xs" data-category="services docker logs">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-surface-container-high text-tertiary font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase">Systemd</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Docker service journal (-1h)</span>
+</div>
+<span class="font-code-sm text-code-sm text-outline">systemd-journal</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between">
+<code class="font-code-md text-code-md text-primary truncate mr-2 select-all">journalctl -u docker.service --since '1 hour ago'</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-code-sm text-code-sm text-outline">Flag: non-blocking</span>
+<div class="flex items-center space-x-2">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Insert</span>
+</button>
+<button class="exec-btn h-8 px-3 rounded-lg bg-primary text-on-primary hover:opacity-95 font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span>Execute</span>
+<span class="font-code-sm text-code-sm">↵</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Item 6: Dangerous Destructive Command -->
+<div class="snippet-card bg-surface-container p-3 rounded-xl shadow-md flex flex-col space-y-space-xs" data-category="docker">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-1.5 py-0.5 rounded tracking-wide uppercase flex items-center space-x-1">
+<span class="material-symbols-outlined text-[12px]">warning</span>
+<span>CONFIRMATION REQUIRED</span>
+</span>
+<span class="text-outline text-label-sm font-label-sm">•</span>
+<span class="font-body-sm text-body-sm text-error">Destructive</span>
+</div>
+<span class="font-code-sm text-code-sm text-error font-bold">PURGE</span>
+</div>
+<div class="bg-surface-container-lowest p-2.5 rounded-lg flex items-center justify-between">
+<code class="font-code-md text-code-md text-error truncate mr-2 font-bold select-all">docker system prune -a --volumes</code>
+<button class="copy-cmd-btn text-outline hover:text-on-surface p-1 rounded hover:bg-surface-container" title="Copy raw command" type="button">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">
+        Purge all unused containers, dangling networks, non-referenced cached images, and detached volumes. Data loss is irreversible.
+      </p>
+<div class="flex items-center justify-between pt-1">
+<button class="insert-btn h-8 px-2.5 rounded-lg bg-surface-container-high text-on-surface hover:bg-surface-bright font-label-md text-label-md transition-colors flex items-center space-x-1" type="button">
+<span class="material-symbols-outlined text-[15px]">input</span>
+<span>Draft Only</span>
+</button>
+<button class="danger-run-btn h-8 px-3 rounded-lg bg-error text-on-error hover:bg-error-container font-label-md text-label-md font-bold transition-all flex items-center space-x-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[15px]">lock_reset</span>
+<span>Confirm &amp; Run</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Action Drawer & Builder Trigger -->
+<div class="pt-space-xs pb-space-sm">
+<button class="w-full h-12 rounded-xl bg-surface-container-high hover:bg-surface-bright text-primary flex items-center justify-center space-x-2 transition-all shadow-sm group" id="open-creator-btn" type="button">
+<div class="w-6 h-6 rounded bg-primary text-on-primary flex items-center justify-center transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</div>
+<span class="font-headline-sm text-headline-sm font-semibold">Create Custom Snippet</span>
+</button>
+<div class="flex items-center justify-center space-x-2 mt-2">
+<span class="font-code-sm text-code-sm text-outline">Supports dynamic params:</span>
+<span class="font-code-sm text-code-sm bg-surface-container text-primary px-1.5 py-0.5 rounded">{{port}}</span>
+<span class="font-code-sm text-code-sm bg-surface-container text-tertiary px-1.5 py-0.5 rounded">{{service}}</span>
+<span class="font-code-sm text-code-sm bg-surface-container text-secondary px-1.5 py-0.5 rounded">{{path}}</span>
+</div>
+</div>
+<!-- Micro-Modal for Snippet Creation (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-surface-container-lowest/80 backdrop-blur-sm hidden flex-col justify-end p-gutter-screen" id="snippet-modal">
+<div class="bg-surface-container w-full rounded-2xl p-4 flex flex-col space-y-3 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-[20px]">code</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">New Template Snippet</span>
+</div>
+<button class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-outline hover:text-on-surface" id="close-modal-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<div class="flex flex-col space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Snippet Title</label>
+<input class="h-9 px-3 bg-surface-container-lowest text-on-surface rounded-lg font-body-md text-body-md focus:outline-none" placeholder="e.g. Docker logs tail with grep" type="text"/>
+</div>
+<div class="flex flex-col space-y-1">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Command Template</label>
+<span class="font-code-sm text-code-sm text-primary">Use {{variable}} for inputs</span>
+</div>
+<textarea class="p-2.5 bg-surface-container-lowest text-primary rounded-lg font-code-md text-code-md focus:outline-none resize-none" placeholder="curl -X POST http://localhost:{{port}}/v1/{{endpoint}} -d '{{payload}}'" rows="3"></textarea>
+</div>
+<div class="flex items-center space-x-2 pt-2">
+<button class="flex-1 h-10 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md" id="cancel-modal-btn" type="button">
+          Cancel
+        </button>
+<button class="flex-1 h-10 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-bold shadow-md" id="save-snippet-btn" type="button">
+          Save Snippet
+        </button>
+</div>
+</div>
+</div>
+<!-- Safety Confirmation Micro-Sheet for Destructive Command -->
+<div class="fixed inset-0 z-50 bg-surface-container-lowest/85 backdrop-blur-sm hidden flex-col justify-center p-gutter-screen" id="danger-modal">
+<div class="bg-surface-container-high w-full max-w-sm mx-auto rounded-2xl p-4 flex flex-col space-y-3 shadow-2xl">
+<div class="flex items-center space-x-2 text-error">
+<span class="material-symbols-outlined text-[24px]">dangerous</span>
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Confirm Destructive Run</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        You are about to execute a full Docker purge on <strong class="text-on-surface">prod-api-01</strong>. All non-running containers and volumes will be permanently wiped.
+      </p>
+<div class="p-2 bg-surface-container-lowest rounded-lg font-code-sm text-code-sm text-error font-mono break-all">
+        docker system prune -a --volumes
+      </div>
+<div class="flex items-center space-x-2 pt-2">
+<button class="flex-1 h-10 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md" id="cancel-danger-btn" type="button">
+          Abort
+        </button>
+<button class="flex-1 h-10 rounded-lg bg-error text-on-error font-label-md text-label-md font-bold shadow-md flex items-center justify-center space-x-1" id="execute-danger-btn" type="button">
+<span>Purge All</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const searchInput = document.getElementById('snippet-search');
+    const clearBtn = document.getElementById('clear-search');
+    const pills = document.querySelectorAll('.cat-pill');
+    const cards = document.querySelectorAll('.snippet-card');
+    const toast = document.getElementById('toast-notify');
+    const toastText = document.getElementById('toast-text');
+
+    function showNotification(msg) {
+      if (!toast) return;
+      toastText.textContent = msg;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 1800);
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      const activePill = document.querySelector('.cat-pill.active');
+      const activeCategory = activePill ? activePill.getAttribute('data-cat') : 'all';
+
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const cardCat = card.getAttribute('data-category') || '';
+        const matchesQuery = !query || text.includes(query);
+        const matchesCat = activeCategory === 'all' || cardCat.includes(activeCategory);
+
+        if (matchesQuery && matchesCat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', applyFilters);
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.value = '';
+          applyFilters();
+          searchInput.focus();
+        }
+      });
+    }
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        pills.forEach(p => {
+          p.classList.remove('active', 'bg-primary', 'text-on-primary');
+          p.classList.add('bg-surface-container', 'text-on-surface-variant');
+        });
+        pill.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        pill.classList.add('active', 'bg-primary', 'text-on-primary');
+        applyFilters();
+      });
+    });
+
+    // Copy Raw Command Micro-interactions
+    document.querySelectorAll('.copy-cmd-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const code = btn.parentElement.querySelector('code')?.innerText || '';
+        if (navigator.clipboard && code) {
+          navigator.clipboard.writeText(code);
+        }
+        showNotification('Copied to clipboard');
+      });
+    });
+
+    // Insert to Terminal
+    document.querySelectorAll('.insert-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.snippet-card');
+        const cmd = card?.querySelector('code')?.innerText || 'command';
+        showNotification(`Inserted into CLI draft`);
+      });
+    });
+
+    // Immediate Execute
+    document.querySelectorAll('.exec-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        showNotification(`Dispatched to prod-api-01`);
+      });
+    });
+
+    // Modal Builder Logic
+    const openCreatorBtn = document.getElementById('open-creator-btn');
+    const snippetModal = document.getElementById('snippet-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const saveSnippetBtn = document.getElementById('save-snippet-btn');
+
+    function toggleModal(open) {
+      if (!snippetModal) return;
+      if (open) {
+        snippetModal.classList.remove('hidden');
+        snippetModal.classList.add('flex');
+      } else {
+        snippetModal.classList.remove('flex');
+        snippetModal.classList.add('hidden');
+      }
+    }
+
+    if (openCreatorBtn) openCreatorBtn.addEventListener('click', () => toggleModal(true));
+    if (closeModalBtn) closeModalBtn.addEventListener('click', () => toggleModal(false));
+    if (cancelModalBtn) cancelModalBtn.addEventListener('click', () => toggleModal(false));
+    if (saveSnippetBtn) {
+      saveSnippetBtn.addEventListener('click', () => {
+        toggleModal(false);
+        showNotification('Snippet saved to palette');
+      });
+    }
+
+    // Danger Zone Confirmation Modal
+    const dangerBtn = document.querySelector('.danger-run-btn');
+    const dangerModal = document.getElementById('danger-modal');
+    const cancelDangerBtn = document.getElementById('cancel-danger-btn');
+    const execDangerBtn = document.getElementById('execute-danger-btn');
+
+    function toggleDangerModal(open) {
+      if (!dangerModal) return;
+      if (open) {
+        dangerModal.classList.remove('hidden');
+        dangerModal.classList.add('flex');
+      } else {
+        dangerModal.classList.remove('flex');
+        dangerModal.classList.add('hidden');
+      }
+    }
+
+    if (dangerBtn) dangerBtn.addEventListener('click', () => toggleDangerModal(true));
+    if (cancelDangerBtn) cancelDangerBtn.addEventListener('click', () => toggleDangerModal(false));
+    if (execDangerBtn) {
+      execDangerBtn.addEventListener('click', () => {
+        toggleDangerModal(false);
+        showNotification('Purge command dispatched');
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container/95 backdrop-blur-xl shadow-[0_-1px_12px_rgba(0,0,0,0.5)]" data-active-classes="text-primary font-bold"><div class="h-16 px-space-xs flex items-stretch justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[48px] px-space-xs transition-colors text-primary font-bold" data-path="files" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">folder</span><span class="font-label-sm text-label-sm uppercase tracking-wider">FILES</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="terminal" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">terminal</span><span class="font-label-sm text-label-sm uppercase tracking-wider">TERMINAL</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="web-preview" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">language</span><span class="font-label-sm text-label-sm uppercase tracking-wider">WEB</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="transfers" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">swap_vert</span><span class="font-label-sm text-label-sm uppercase tracking-wider">TRANSFERS</span></a><a class="flex flex-col items-center justify-center min-w-[48px] px-space-xs text-on-surface-variant transition-colors" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px] mb-0.5">tune</span><span class="font-label-sm text-label-sm uppercase tracking-wider">SETTINGS</span></a></div></nav></body></html>
