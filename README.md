@@ -172,5 +172,3 @@ No test suite exists yet in this phase (see "Known limitations").
 6. In Files, open a small text file, edit it, Save, then re-open it (or
    check it directly on the server) to confirm the write actually landed
    remotely — this is real now, not the Phase 1 mock buffer.
-
-   just checking git options
