@@ -38,34 +38,17 @@ abstract interface class TransferManager extends ChangeNotifier {
   void clearCompleted();
 }
 
-/// Mock manager: enqueued transfers "run" on a timer with a randomized
-/// speed, no real bytes move anywhere. Clearly a simulation — screens
-/// built on this must not claim a real upload/download succeeded.
+/// Tracks real transfers driven externally via [registerExternalTransfer]
+/// (the SFTP screen's actual upload/download flows), plus [enqueue] as a
+/// leftover self-ticking simulation capability that is NOT used by
+/// default anywhere in the app — nothing calls it, and this manager
+/// starts empty. It's kept only in case a future demo/offline mode wants
+/// synthetic transfers again; it must never be wired to real screens
+/// without being obviously labeled as a demo.
 class MockTransferManager extends ChangeNotifier implements TransferManager {
   final List<TransferItem> _transfers = [];
   final Map<String, Timer> _timers = {};
   int _nextId = 1;
-
-  MockTransferManager() {
-    // Seed two in-flight transfers so the Transfers tab has something to
-    // show immediately, matching the "2" badge count in the Stitch header.
-    _seedTransfer('backup_20250218.tar.gz', TransferDirection.download, 245 * 1024 * 1024, 96 * 1024 * 1024);
-    _seedTransfer('site-release-v4.zip', TransferDirection.upload, 58 * 1024 * 1024, 12 * 1024 * 1024);
-  }
-
-  void _seedTransfer(String name, TransferDirection dir, int total, int transferred) {
-    final id = 'xfer-${_nextId++}';
-    _transfers.add(TransferItem(
-      id: id,
-      filename: name,
-      direction: dir,
-      totalBytes: total,
-      transferredBytes: transferred,
-      status: TransferStatus.running,
-      speedBytesPerSec: 1.2 * 1024 * 1024,
-    ));
-    _startTicking(id);
-  }
 
   @override
   List<TransferItem> get transfers => List.unmodifiable(_transfers);

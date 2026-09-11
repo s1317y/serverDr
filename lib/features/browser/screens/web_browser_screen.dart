@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/widgets/app_top_bar.dart';
+import '../../../core/widgets/server_connection_sheet.dart';
 import '../../connections/services/connection_repository.dart';
 import '../services/web_view_service.dart';
 
@@ -36,8 +37,9 @@ class _WebBrowserScreenState extends State<WebBrowserScreen> {
       appBar: AppTopBar(
         sectionLabel: 'Web',
         activeConnection: active,
-        onTapConnectionPill: () => context.push('/connections'),
+        onTapConnectionPill: () => showServerConnectionSheet(context, active),
         onTapConnections: () => context.push('/connections'),
+        onTapProfile: () => context.push('/settings'),
         onTapTransfers: () => context.push('/transfers'),
       ),
       body: Column(

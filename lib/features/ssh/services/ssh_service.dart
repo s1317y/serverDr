@@ -68,4 +68,20 @@ abstract interface class SshService {
     String? privateKeyOverride,
     String? passphraseOverride,
   });
+
+  /// Runs a single read-only (or explicitly confirmed) command over its
+  /// OWN exec channel on the SAME underlying SSH connection as the
+  /// interactive terminal for this profile, if one is open — a real SSH
+  /// connection multiplexes independent channels, so this never blocks
+  /// or interleaves with the terminal's shell channel. If no session is
+  /// open yet, a background (shell-less) connection is opened and kept
+  /// alive for reuse by subsequent Health/Security calls, rather than
+  /// reconnecting on every check. Used by `HealthService`/`SecurityService`
+  /// — never called directly from widgets.
+  Future<String> runCommand(
+    ConnectionProfile profile,
+    String command, {
+    required HostKeyDecisionHandler onHostKeyVerification,
+    Duration timeout = const Duration(seconds: 12),
+  });
 }

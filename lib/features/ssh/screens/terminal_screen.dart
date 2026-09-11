@@ -8,6 +8,7 @@ import 'package:xterm/xterm.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/widgets/app_top_bar.dart';
+import '../../../core/widgets/server_connection_sheet.dart';
 import '../../../core/widgets/error_state_view.dart';
 import '../../connections/models/connection_profile.dart';
 import '../../connections/services/connection_repository.dart';
@@ -127,8 +128,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
       appBar: AppTopBar(
         sectionLabel: 'Terminal',
         activeConnection: active,
-        onTapConnectionPill: () => context.push('/connections'),
+        onTapConnectionPill: () => showServerConnectionSheet(context, active),
         onTapConnections: () => context.push('/connections'),
+        onTapProfile: () => context.push('/settings'),
         onTapTransfers: () => context.push('/transfers'),
       ),
       body: _buildBody(active),

@@ -26,6 +26,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onTapConnectionPill,
     required this.onTapConnections,
     this.onTapTransfers,
+    this.onTapProfile,
     this.pendingTransfers = 0,
   });
 
@@ -34,6 +35,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onTapConnectionPill;
   final VoidCallback onTapConnections;
   final VoidCallback? onTapTransfers;
+
+  /// Opens Settings/About — the profile avatar took over this job once
+  /// Settings moved off the bottom nav to make room for Health/Security.
+  final VoidCallback? onTapProfile;
   final int pendingTransfers;
 
   static const double _toolbarHeight = 64;
@@ -78,12 +83,16 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
           onTap: onTapConnections,
         ),
         const SizedBox(width: 4),
-        const Padding(
-          padding: EdgeInsets.only(right: 12),
-          child: CircleAvatar(
-            radius: 16,
-            backgroundColor: AppColors.primary,
-            child: Icon(Icons.person, size: 18, color: AppColors.onPrimary),
+        Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: InkWell(
+            onTap: onTapProfile,
+            customBorder: const CircleBorder(),
+            child: const CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.primary,
+              child: Icon(Icons.person, size: 18, color: AppColors.onPrimary),
+            ),
           ),
         ),
       ],

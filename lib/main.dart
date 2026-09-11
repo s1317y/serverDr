@@ -8,6 +8,9 @@ import 'core/security/host_key_store.dart';
 import 'core/storage/secure_credential_store.dart';
 import 'features/browser/services/web_view_service.dart';
 import 'features/connections/services/connection_repository.dart';
+import 'features/health/services/health_service.dart';
+import 'features/health/services/real_health_service.dart';
+import 'features/security/services/security_service.dart';
 import 'features/sftp/services/real_sftp_service.dart';
 import 'features/sftp/services/sftp_service.dart';
 import 'features/ssh/services/real_ssh_service.dart';
@@ -53,6 +56,12 @@ Future<void> main() async {
         ),
         Provider<SftpService>(
           create: (_) => RealSftpService(hostKeyStore: hostKeyStore, credentialStore: credentialStore),
+        ),
+        ProxyProvider<SshService, HealthService>(
+          update: (_, sshService, __) => RealHealthService(sshService),
+        ),
+        ProxyProvider<SshService, SecurityService>(
+          update: (_, sshService, __) => SecurityService(sshService),
         ),
         ChangeNotifierProvider<TransferManager>(create: (_) => MockTransferManager()),
         ChangeNotifierProvider<WebViewService>(create: (_) => StubWebViewService()),

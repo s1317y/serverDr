@@ -23,6 +23,24 @@ builds do not** unless it's explicitly in the manifest. No other special
 permission is needed — `file_picker` uses Android's Storage Access
 Framework, which needs no manifest entry or runtime permission grant.
 
+**Also bump `compileSdk` to 36.** `file_picker`'s transitive
+`flutter_plugin_android_lifecycle` dependency requires compiling against
+API 36+. This is NOT just your app module's setting — plugin subprojects
+(like `file_picker` itself) compile against a separate shared value,
+`flutter.compileSdkVersion`, that Flutter's tooling injects into every
+plugin's Gradle build. Editing `android/app/build.gradle.kts`'s
+`compileSdk` alone won't fix a "plugin requires newer API" error for that
+reason. Instead, add this to `android/local.properties`:
+
+```
+flutter.compileSdkVersion=36
+```
+
+then `flutter clean && flutter pub get` before rebuilding. If your Flutter
+SDK doesn't honor that property, `flutter upgrade` is the more durable
+fix — recent Flutter versions default higher already, so this stops
+coming up as plugins update.
+
 ## Getting it running
 
 Same as before — this sandbox has no Flutter/Dart SDK, so none of this

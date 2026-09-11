@@ -31,6 +31,13 @@ class RealSshService implements SshService {
   final SecureCredentialStore _credentialStore;
   final Map<String, _RealSshSession> _sessions = {};
 
+  /// Shell-less connections kept alive purely so Health/Security checks
+  /// don't reopen a fresh TCP+auth handshake on every single command —
+  /// see [runCommand]. Separate from [_sessions] (which back the
+  /// interactive terminal) since a profile may have a background client
+  /// running here even with no Terminal tab ever opened.
+  final Map<String, SSHClient> _backgroundClients = {};
+
   @override
   SshSession? sessionFor(String connectionId) => _sessions[connectionId];
 
@@ -71,6 +78,42 @@ class RealSshService implements SshService {
   Future<void> disconnect(String connectionId) async {
     final session = _sessions.remove(connectionId);
     await session?.close();
+    _backgroundClients.remove(connectionId)?.close();
+  }
+
+  @override
+  Future<String> runCommand(
+    ConnectionProfile profile,
+    String command, {
+    required HostKeyDecisionHandler onHostKeyVerification,
+    Duration timeout = const Duration(seconds: 12),
+  }) async {
+    // Reuse the interactive session's client if the Terminal tab already
+    // has one open — a real SSH connection multiplexes independent
+    // channels, so `client.run()` here opens its own exec channel and
+    // does not interleave with or block the shell channel.
+    SSHClient? client = _sessions[profile.id]?._client;
+    client ??= _backgroundClients[profile.id];
+
+    if (client == null || client.isClosed) {
+      client = await _buildClient(profile, onHostKeyVerification: onHostKeyVerification);
+      try {
+        await client.authenticated;
+      } catch (e) {
+        client.close();
+        throw _mapConnectError(e);
+      }
+      _backgroundClients[profile.id] = client;
+    }
+
+    try {
+      final result = await client.run(command).timeout(timeout);
+      return utf8.decode(result, allowMalformed: true);
+    } on TimeoutException {
+      throw const AppFailure(AppFailureKind.timeout);
+    } catch (e) {
+      throw _mapConnectError(e);
+    }
   }
 
   @override

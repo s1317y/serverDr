@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/utils/byte_format.dart';
 import '../../../core/widgets/app_top_bar.dart';
+import '../../../core/widgets/server_connection_sheet.dart';
 import '../../../core/widgets/error_state_view.dart';
 import '../../connections/services/connection_repository.dart';
 import '../models/transfer_item.dart';
@@ -22,8 +23,9 @@ class TransfersScreen extends StatelessWidget {
       appBar: AppTopBar(
         sectionLabel: 'Transfers',
         activeConnection: active,
-        onTapConnectionPill: () => context.push('/connections'),
+        onTapConnectionPill: () => showServerConnectionSheet(context, active),
         onTapConnections: () => context.push('/connections'),
+        onTapProfile: () => context.push('/settings'),
         onTapTransfers: () {},
         pendingTransfers: manager.activeCount,
       ),

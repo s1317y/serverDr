@@ -36,20 +36,6 @@ class TerminalKeyBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _Key(label: 'CTRL+C', color: AppColors.error, bold: true, onTap: () => onSendRaw(_ctrlC)),
-            _Key(label: 'CTRL+D', onTap: () => onSendRaw(_ctrlD)),
-            _Key(label: 'CTRL+L', onTap: () => onSendRaw(_ctrlL)),
-            _Key(label: 'CTRL+Z', onTap: () => onSendRaw(_ctrlZ)),
-            _Key(label: 'TAB', onTap: () => onSendRaw(_tab)),
-            _Key(label: 'ESC', onTap: () => onSendRaw(_esc)),
-            _IconKey(icon: Icons.arrow_upward, onTap: () => onSendRaw(_up)),
-            _IconKey(icon: Icons.arrow_downward, onTap: () => onSendRaw(_down)),
-            _IconKey(icon: Icons.arrow_back, onTap: () => onSendRaw(_left)),
-            _IconKey(icon: Icons.arrow_forward, onTap: () => onSendRaw(_right)),
-            _Key(label: '/', onTap: () => onSendRaw('/'.codeUnits)),
-            _Key(label: '|', onTap: () => onSendRaw('|'.codeUnits)),
-            _Key(label: '~', onTap: () => onSendRaw('~'.codeUnits)),
-            const SizedBox(width: 4),
             Material(
               color: AppColors.primaryContainer,
               borderRadius: BorderRadius.circular(4),
@@ -78,6 +64,22 @@ class TerminalKeyBar extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 8),
+            Container(width: 1, height: 20, color: AppColors.outlineVariant),
+            const SizedBox(width: 8),
+            _Key(label: 'CTRL+C', color: AppColors.error, bold: true, onTap: () => onSendRaw(_ctrlC)),
+            _Key(label: 'CTRL+D', onTap: () => onSendRaw(_ctrlD)),
+            _Key(label: 'CTRL+L', onTap: () => onSendRaw(_ctrlL)),
+            _Key(label: 'CTRL+Z', onTap: () => onSendRaw(_ctrlZ)),
+            _Key(label: 'TAB', onTap: () => onSendRaw(_tab)),
+            _Key(label: 'ESC', onTap: () => onSendRaw(_esc)),
+            _IconKey(icon: Icons.arrow_upward, onTap: () => onSendRaw(_up)),
+            _IconKey(icon: Icons.arrow_downward, onTap: () => onSendRaw(_down)),
+            _IconKey(icon: Icons.arrow_back, onTap: () => onSendRaw(_left)),
+            _IconKey(icon: Icons.arrow_forward, onTap: () => onSendRaw(_right)),
+            _Key(label: '/', onTap: () => onSendRaw('/'.codeUnits)),
+            _Key(label: '|', onTap: () => onSendRaw('|'.codeUnits)),
+            _Key(label: '~', onTap: () => onSendRaw('~'.codeUnits)),
           ],
         ),
       ),
@@ -87,6 +89,7 @@ class TerminalKeyBar extends StatelessWidget {
 
 class _Key extends StatelessWidget {
   const _Key({required this.label, required this.onTap, this.color, this.bold = false});
+
 
   final String label;
   final VoidCallback onTap;

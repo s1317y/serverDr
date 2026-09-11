@@ -7,6 +7,8 @@ import '../features/browser/screens/web_browser_screen.dart';
 import '../features/connections/screens/connection_editor_screen.dart';
 import '../features/connections/screens/connections_screen.dart';
 import '../features/editor/screens/editor_screen.dart';
+import '../features/health/screens/health_screen.dart';
+import '../features/security/screens/security_screen.dart';
 import '../features/settings/screens/known_hosts_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
 import '../features/sftp/models/remote_file.dart';
@@ -33,12 +35,23 @@ final GoRouter appRouter = GoRouter(
           GoRoute(path: '/web', builder: (context, state) => const WebBrowserScreen()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/transfers', builder: (context, state) => const TransfersScreen()),
+          GoRoute(path: '/health', builder: (context, state) => const HealthScreen()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
+          GoRoute(path: '/security', builder: (context, state) => const SecurityScreen()),
+        ]),
+        StatefulShellBranch(routes: [
+          GoRoute(path: '/transfers', builder: (context, state) => const TransfersScreen()),
         ]),
       ],
+    ),
+    // Settings is no longer a bottom-nav tab (6 tabs already fill the bar
+    // once Health/Security were added) — reached via the profile avatar
+    // in the top bar instead. See AppShell's doc.
+    GoRoute(
+      path: '/settings',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(
       path: '/settings/known-hosts',
