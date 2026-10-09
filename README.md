@@ -85,7 +85,7 @@ Each finding has a detail view with evidence, the command used and a recommended
 ## Build and run
 
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/s1317y/serverDr>
 cd serverdr
 
 flutter pub get
