@@ -494,4 +494,513 @@ const List<CommandShortcut> kDefaultCommands = [
     description: 'Recent failed SSH password attempts',
     category: CommandCategory.logs,
   ),
+
+  // ---------------------------------------------------------------
+  // Parameterized commands — prompt for a value before running.
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Service Status',
+    command: 'systemctl status {service}',
+    description: 'Check the status of a specific service by name',
+    category: CommandCategory.services,
+  ),
+  CommandShortcut(
+    name: 'Restart Service',
+    command: 'systemctl restart {service}',
+    description: 'Restart a specific service by name',
+    category: CommandCategory.services,
+    dangerous: true,
+  ),
+  CommandShortcut(
+    name: 'View Service Log',
+    command: 'journalctl -u {service} -n 100 --no-pager',
+    description: 'Last 100 journal lines for a specific service',
+    category: CommandCategory.logs,
+  ),
+  CommandShortcut(
+    name: 'Find Recently Changed Files',
+    command: 'find {path} -type f -mtime -{days}',
+    description: 'Files modified in the last N days under a path',
+    category: CommandCategory.files,
+  ),
+  CommandShortcut(
+    name: 'Grep in Path',
+    command: "grep -r '{pattern}' {path}",
+    description: 'Search for a text pattern recursively under a path',
+    category: CommandCategory.files,
+  ),
+  CommandShortcut(
+    name: 'Tail a File',
+    command: 'tail -f -n 100 {path}',
+    description: 'Follow the end of a specific log or file',
+    category: CommandCategory.logs,
+  ),
+  CommandShortcut(
+    name: 'Kill by PID',
+    command: 'kill -9 {pid}',
+    description: 'Force-terminate a specific process',
+    category: CommandCategory.processes,
+    dangerous: true,
+  ),
+  CommandShortcut(
+    name: 'Container Logs',
+    command: 'docker logs -f --tail 200 {container}',
+    description: 'Follow logs for a specific container',
+    category: CommandCategory.docker,
+  ),
+  CommandShortcut(
+    name: 'Container Shell',
+    command: 'docker exec -it {container} /bin/bash',
+    description: 'Attach an interactive shell inside a specific container',
+    category: CommandCategory.docker,
+  ),
+  CommandShortcut(
+    name: 'Check DNS Record',
+    command: 'dig {domain}',
+    description: 'Resolve a specific domain\'s DNS records',
+    category: CommandCategory.dns,
+  ),
+  CommandShortcut(
+    name: 'Check Certificate Expiry',
+    command: 'echo | openssl s_client -connect {domain}:443 -servername {domain} 2>/dev/null | openssl x509 -noout -dates',
+    description: 'Show a specific domain\'s TLS certificate validity dates',
+    category: CommandCategory.sslTls,
+  ),
+
+  // ---------------------------------------------------------------
+  // CPU / Memory (dedicated deep-dive category)
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Virtual memory stats',
+    command: 'vmstat 1 5',
+    description: 'Kernel threads, memory, paging and CPU activity over 5 samples',
+    category: CommandCategory.cpuMemory,
+  ),
+  CommandShortcut(
+    name: 'Per-core CPU usage',
+    command: 'mpstat -P ALL 1 3',
+    description: 'Per-core CPU utilization (needs sysstat)',
+    category: CommandCategory.cpuMemory,
+  ),
+  CommandShortcut(
+    name: 'Memory map summary',
+    command: 'cat /proc/meminfo',
+    description: 'Full raw kernel memory accounting',
+    category: CommandCategory.cpuMemory,
+  ),
+  CommandShortcut(
+    name: 'NUMA memory layout',
+    command: 'numactl --hardware',
+    description: 'NUMA node memory distribution, if applicable',
+    category: CommandCategory.cpuMemory,
+  ),
+
+  // ---------------------------------------------------------------
+  // PHP
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'PHP version',
+    command: 'php -v',
+    description: 'Installed PHP version and build info',
+    category: CommandCategory.php,
+  ),
+  CommandShortcut(
+    name: 'Loaded PHP modules',
+    command: 'php -m',
+    description: 'List all loaded PHP extensions',
+    category: CommandCategory.php,
+  ),
+  CommandShortcut(
+    name: 'PHP config values',
+    command: 'php --ini',
+    description: 'Show which php.ini files are loaded',
+    category: CommandCategory.php,
+  ),
+  CommandShortcut(
+    name: 'PHP-FPM status',
+    command: 'systemctl status php-fpm* 2>/dev/null || systemctl status php*-fpm',
+    description: 'Check PHP-FPM service state (name varies by distro/version)',
+    category: CommandCategory.php,
+  ),
+
+  // ---------------------------------------------------------------
+  // Database
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'MySQL/MariaDB status',
+    command: 'systemctl status mysql 2>/dev/null || systemctl status mariadb',
+    description: 'Check MySQL or MariaDB service state',
+    category: CommandCategory.database,
+  ),
+  CommandShortcut(
+    name: 'PostgreSQL status',
+    command: 'systemctl status postgresql',
+    description: 'Check PostgreSQL service state',
+    category: CommandCategory.database,
+  ),
+  CommandShortcut(
+    name: 'Database processes',
+    command: "ps aux | grep -E 'mysqld|postgres|mongod|redis-server'",
+    description: 'Running database server processes',
+    category: CommandCategory.database,
+  ),
+  CommandShortcut(
+    name: 'Database listening ports',
+    command: 'ss -tulpn | grep -E ":3306|:5432|:27017|:6379"',
+    description: 'Common database ports currently listening',
+    category: CommandCategory.database,
+  ),
+
+  // ---------------------------------------------------------------
+  // Security
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Logged in users',
+    command: 'who',
+    description: 'Who is currently logged into this server',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Login history',
+    command: 'last -20',
+    description: 'Last 20 login sessions',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Last log failures',
+    command: 'lastlog',
+    description: 'Most recent login per user, including never-logged-in accounts',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Find SUID binaries',
+    command: 'find / -perm -4000 -type f 2>/dev/null',
+    description: 'Binaries that run with owner (often root) privileges regardless of caller',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Find SGID binaries',
+    command: 'find / -perm -2000 -type f 2>/dev/null',
+    description: 'Binaries that run with group privileges regardless of caller',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Find world-writable files',
+    command: 'find / -xdev -type f -perm -0002 2>/dev/null',
+    description: 'Files any local user can modify — review unexpected ones',
+    category: CommandCategory.security,
+  ),
+  CommandShortcut(
+    name: 'Inspect authorized_keys',
+    command: 'cat ~/.ssh/authorized_keys 2>/dev/null',
+    description: 'SSH public keys authorized for the current user',
+    category: CommandCategory.security,
+  ),
+
+  // ---------------------------------------------------------------
+  // Users
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Current user ID',
+    command: 'id',
+    description: 'UID/GID and group memberships of the current user',
+    category: CommandCategory.users,
+  ),
+  CommandShortcut(
+    name: 'All system users',
+    command: 'getent passwd',
+    description: 'Full list of local user accounts',
+    category: CommandCategory.users,
+  ),
+  CommandShortcut(
+    name: 'All system groups',
+    command: 'getent group',
+    description: 'Full list of local groups',
+    category: CommandCategory.users,
+  ),
+  CommandShortcut(
+    name: 'Current user\'s groups',
+    command: 'groups',
+    description: 'Groups the current user belongs to',
+    category: CommandCategory.users,
+  ),
+  CommandShortcut(
+    name: 'Who is logged in (verbose)',
+    command: 'w',
+    description: 'Logged-in users and what they\'re running',
+    category: CommandCategory.users,
+  ),
+
+  // ---------------------------------------------------------------
+  // Permissions
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Long listing with permissions',
+    command: 'ls -lah',
+    description: 'Detailed file listing including hidden files',
+    category: CommandCategory.permissions,
+  ),
+  CommandShortcut(
+    name: 'File status details',
+    command: 'stat',
+    description: 'Detailed metadata for a file (append path)',
+    category: CommandCategory.permissions,
+  ),
+  CommandShortcut(
+    name: 'Resolve path permissions',
+    command: 'namei -l',
+    description: 'Show permissions of every component in a path (append path)',
+    category: CommandCategory.permissions,
+  ),
+
+  // ---------------------------------------------------------------
+  // SSH
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'SSH client version',
+    command: 'ssh -V',
+    description: 'Installed OpenSSH version',
+    category: CommandCategory.ssh,
+  ),
+  CommandShortcut(
+    name: 'Effective sshd config',
+    command: 'sshd -T 2>/dev/null | head -40',
+    description: 'Resolved SSH daemon configuration (includes + defaults applied)',
+    category: CommandCategory.ssh,
+  ),
+  CommandShortcut(
+    name: 'sshd service status',
+    command: 'systemctl status sshd 2>/dev/null || systemctl status ssh',
+    description: 'Check the SSH daemon service state',
+    category: CommandCategory.ssh,
+  ),
+
+  // ---------------------------------------------------------------
+  // Git
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Git status',
+    command: 'git status',
+    description: 'Working tree status for the repo in the current directory',
+    category: CommandCategory.git,
+  ),
+  CommandShortcut(
+    name: 'Git branches',
+    command: 'git branch -a',
+    description: 'List local and remote branches',
+    category: CommandCategory.git,
+  ),
+  CommandShortcut(
+    name: 'Git recent log',
+    command: 'git log --oneline -20',
+    description: 'Last 20 commits, one line each',
+    category: CommandCategory.git,
+  ),
+  CommandShortcut(
+    name: 'Git remotes',
+    command: 'git remote -v',
+    description: 'Configured remotes for the current repo',
+    category: CommandCategory.git,
+  ),
+
+  // ---------------------------------------------------------------
+  // Cron
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Current user\'s crontab',
+    command: 'crontab -l',
+    description: 'Scheduled cron jobs for the current user',
+    category: CommandCategory.cron,
+  ),
+  CommandShortcut(
+    name: 'System-wide cron jobs',
+    command: 'cat /etc/crontab; ls /etc/cron.d/',
+    description: 'System crontab and drop-in cron.d files',
+    category: CommandCategory.cron,
+  ),
+  CommandShortcut(
+    name: 'Systemd timers',
+    command: 'systemctl list-timers --all',
+    description: 'Systemd timer units (a common cron alternative)',
+    category: CommandCategory.cron,
+  ),
+
+  // ---------------------------------------------------------------
+  // Systemd
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'All units',
+    command: 'systemctl list-units --all',
+    description: 'Every loaded systemd unit and its state',
+    category: CommandCategory.systemd,
+  ),
+  CommandShortcut(
+    name: 'Failed units',
+    command: 'systemctl --failed',
+    description: 'Units that failed to start',
+    category: CommandCategory.systemd,
+  ),
+  CommandShortcut(
+    name: 'Daemon reload',
+    command: 'systemctl daemon-reload',
+    description: 'Reload unit files after editing one manually',
+    category: CommandCategory.systemd,
+    dangerous: true,
+  ),
+
+  // ---------------------------------------------------------------
+  // Package management
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'APT update check',
+    command: 'apt list --upgradable 2>/dev/null',
+    description: 'Packages with available updates (Debian/Ubuntu)',
+    category: CommandCategory.packageManagement,
+  ),
+  CommandShortcut(
+    name: 'APT history',
+    command: 'cat /var/log/apt/history.log | tail -50',
+    description: 'Recent apt install/remove/upgrade history',
+    category: CommandCategory.packageManagement,
+  ),
+  CommandShortcut(
+    name: 'DNF update check',
+    command: 'dnf check-update',
+    description: 'Packages with available updates (Fedora/RHEL/Rocky/Alma)',
+    category: CommandCategory.packageManagement,
+  ),
+  CommandShortcut(
+    name: 'DNF history',
+    command: 'dnf history',
+    description: 'Recent dnf transaction history',
+    category: CommandCategory.packageManagement,
+  ),
+  CommandShortcut(
+    name: 'APK installed packages',
+    command: 'apk info',
+    description: 'List installed packages (Alpine)',
+    category: CommandCategory.packageManagement,
+  ),
+  CommandShortcut(
+    name: 'List installed packages (dpkg)',
+    command: 'dpkg -l | head -50',
+    description: 'Installed packages via dpkg (Debian/Ubuntu)',
+    category: CommandCategory.packageManagement,
+  ),
+
+  // ---------------------------------------------------------------
+  // Archives
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Create tar.gz',
+    command: 'tar -czvf archive.tar.gz {path}',
+    description: 'Compress a folder into a gzip tarball',
+    category: CommandCategory.archives,
+  ),
+  CommandShortcut(
+    name: 'Extract tar.gz',
+    command: 'tar -xzvf {path}',
+    description: 'Extract a gzip tarball in the current directory',
+    category: CommandCategory.archives,
+  ),
+  CommandShortcut(
+    name: 'Zip a folder',
+    command: 'zip -r archive.zip {path}',
+    description: 'Compress a folder into a zip archive',
+    category: CommandCategory.archives,
+  ),
+  CommandShortcut(
+    name: 'Unzip an archive',
+    command: 'unzip {path}',
+    description: 'Extract a zip archive in the current directory',
+    category: CommandCategory.archives,
+  ),
+
+  // ---------------------------------------------------------------
+  // Diagnostics
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Kernel ring buffer',
+    command: 'dmesg -T | tail -100',
+    description: 'Recent kernel messages, human-readable timestamps',
+    category: CommandCategory.diagnostics,
+  ),
+  CommandShortcut(
+    name: 'System load + I/O snapshot',
+    command: 'vmstat 1 5',
+    description: 'Combined CPU/memory/IO snapshot over 5 samples',
+    category: CommandCategory.diagnostics,
+  ),
+  CommandShortcut(
+    name: 'Disk I/O stats',
+    command: 'iostat -x 1 3',
+    description: 'Per-device throughput and latency (needs sysstat)',
+    category: CommandCategory.diagnostics,
+  ),
+  CommandShortcut(
+    name: 'Open file descriptors count',
+    command: 'lsof | wc -l',
+    description: 'Total open file descriptors system-wide',
+    category: CommandCategory.diagnostics,
+  ),
+
+  // ---------------------------------------------------------------
+  // Kernel
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'Kernel version',
+    command: 'uname -r',
+    description: 'Running kernel version',
+    category: CommandCategory.kernel,
+  ),
+  CommandShortcut(
+    name: 'Loaded kernel modules',
+    command: 'lsmod | head -30',
+    description: 'Currently loaded kernel modules',
+    category: CommandCategory.kernel,
+  ),
+  CommandShortcut(
+    name: 'Kernel parameters',
+    command: 'sysctl -a 2>/dev/null | head -50',
+    description: 'Runtime kernel tunables',
+    category: CommandCategory.kernel,
+  ),
+
+  // ---------------------------------------------------------------
+  // DNS
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'DNS lookup',
+    command: 'dig google.com',
+    description: 'Example DNS resolution — edit the domain before running',
+    category: CommandCategory.dns,
+  ),
+  CommandShortcut(
+    name: 'Reverse DNS / nslookup',
+    command: 'nslookup',
+    description: 'Interactive/one-shot DNS lookup tool (append a host)',
+    category: CommandCategory.dns,
+  ),
+  CommandShortcut(
+    name: 'Resolver configuration',
+    command: 'cat /etc/resolv.conf',
+    description: 'Which DNS servers this host is configured to use',
+    category: CommandCategory.dns,
+  ),
+
+  // ---------------------------------------------------------------
+  // SSL/TLS
+  // ---------------------------------------------------------------
+  CommandShortcut(
+    name: 'OpenSSL version',
+    command: 'openssl version',
+    description: 'Installed OpenSSL version',
+    category: CommandCategory.sslTls,
+  ),
+  CommandShortcut(
+    name: 'Inspect a local cert file',
+    command: 'openssl x509 -in {path} -noout -text',
+    description: 'Show full details of a certificate file on disk',
+    category: CommandCategory.sslTls,
+  ),
 ];

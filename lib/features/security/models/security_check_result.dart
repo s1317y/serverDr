@@ -63,6 +63,8 @@ class SecurityCheckResult {
     required this.evidence,
     required this.timestamp,
     this.metadata = const {},
+    this.command,
+    this.recommendedAction,
   });
 
   final String id;
@@ -80,6 +82,28 @@ class SecurityCheckResult {
 
   final DateTime timestamp;
   final Map<String, String> metadata;
+
+  /// The read-only command that produced this finding, shown in the
+  /// detail drill-down so the admin can re-run it themselves. Optional —
+  /// not every check maps cleanly to one command.
+  final String? command;
+
+  /// A suggested next step — deliberately advisory ("Consider..."), never
+  /// an instruction ServerDr would execute itself.
+  final String? recommendedAction;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'category': category.label,
+        'severity': severity.label,
+        'description': description,
+        'evidence': evidence,
+        'timestamp': timestamp.toIso8601String(),
+        'metadata': metadata,
+        if (command != null) 'command': command,
+        if (recommendedAction != null) 'recommendedAction': recommendedAction,
+      };
 }
 
 /// The result of running a full (or category-filtered) scan — what the
@@ -96,4 +120,11 @@ class SecurityScanResult {
   int get reviewCount => findings.where((f) => f.severity == SecuritySeverity.review).length;
   int get warningCount => findings.where((f) => f.severity == SecuritySeverity.warning).length;
   int get criticalCount => findings.where((f) => f.severity == SecuritySeverity.critical).length;
+
+  Map<String, dynamic> toJson() => {
+        'server': serverName,
+        'completedAt': completedAt.toIso8601String(),
+        'summary': {'pass': passCount, 'review': reviewCount, 'warning': warningCount, 'critical': criticalCount},
+        'findings': findings.map((f) => f.toJson()).toList(),
+      };
 }

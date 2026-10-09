@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_failure.dart';
@@ -95,7 +98,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'ServerKit performs non-invasive inspection using standard POSIX utilities '
+                  'ServerDr performs non-invasive inspection using standard POSIX utilities '
                   '(cat, ss, find, journalctl). This is not antivirus, EDR, or a guaranteed '
                   'vulnerability scanner — findings need human review.',
                   style: TextStyle(fontFamily: 'Geist', fontSize: 11, color: AppColors.onSurface),
@@ -114,6 +117,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
               : const Icon(Icons.play_arrow, size: 18),
           label: Text(_scanning ? 'Running checks...' : 'Run Security Check'),
         ),
+        if (result != null) ...[
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => _exportResult(result),
+            icon: const Icon(Icons.ios_share, size: 16),
+            label: const Text('Export Results'),
+          ),
+        ],
         const SizedBox(height: 16),
         if (result == null && !_scanning)
           const Padding(
@@ -160,6 +171,74 @@ class _SecurityScreenState extends State<SecurityScreen> {
     );
   }
 
+  Future<void> _exportResult(SecurityScanResult result) async {
+    final json = const JsonEncoder.withIndent('  ').convert(result.toJson());
+    await SharePlus.instance.share(ShareParams(text: json, subject: 'ServerDr security report — ${result.serverName}'));
+  }
+
+  void _showFindingDetail(SecurityCheckResult finding) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(finding.title),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _detailRow('Status', finding.severity.label),
+              _detailRow('Category', finding.category.label),
+              _detailRow('Timestamp', finding.timestamp.toLocal().toString().split('.').first),
+              const SizedBox(height: 8),
+              const Text('Why it matters', style: TextStyle(fontFamily: 'Geist', fontSize: 12, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(finding.description, style: const TextStyle(fontFamily: 'Geist', fontSize: 12, color: AppColors.onSurfaceVariant)),
+              if (finding.evidence.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                const Text('Evidence', style: TextStyle(fontFamily: 'Geist', fontSize: 12, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: AppColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(4)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: finding.evidence
+                        .map((e) => Text(e, style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 11)))
+                        .toList(),
+                  ),
+                ),
+              ],
+              if (finding.command != null) ...[
+                const SizedBox(height: 8),
+                const Text('Related command', style: TextStyle(fontFamily: 'Geist', fontSize: 12, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 2),
+                SelectableText(finding.command!, style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12, color: AppColors.primary)),
+              ],
+              if (finding.recommendedAction != null) ...[
+                const SizedBox(height: 8),
+                const Text('Recommended action', style: TextStyle(fontFamily: 'Geist', fontSize: 12, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 2),
+                Text(finding.recommendedAction!, style: const TextStyle(fontFamily: 'Geist', fontSize: 12, color: AppColors.tertiary)),
+              ],
+            ],
+          ),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+      ),
+    );
+  }
+
+  Widget _detailRow(String label, String value) => Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Row(
+          children: [
+            SizedBox(width: 90, child: Text(label, style: const TextStyle(fontFamily: 'Geist', fontSize: 11, color: AppColors.onSurfaceVariant))),
+            Expanded(child: Text(value, style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12))),
+          ],
+        ),
+      );
+
   Widget _findingCard(SecurityCheckResult finding) {
     final color = switch (finding.severity) {
       SecuritySeverity.pass => AppColors.secondary,
@@ -168,7 +247,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
       SecuritySeverity.warning => AppColors.error,
       SecuritySeverity.critical => AppColors.error,
     };
-    return Container(
+    return InkWell(
+      onTap: () => _showFindingDetail(finding),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -214,6 +295,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
           ],
         ],
       ),
+    ),
     );
   }
 }

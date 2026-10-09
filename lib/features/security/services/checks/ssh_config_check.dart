@@ -64,7 +64,7 @@ class SshConfigCheck implements SecurityCheck {
 
     final results = <SecurityCheckResult>[];
 
-    void addCheck(String key, String friendlyName, {required bool reviewIf}) {
+    void addCheck(String key, String friendlyName, {required bool reviewIf, String? recommendedAction}) {
       final value = settings[key];
       if (value == null) return;
       final isReview = reviewIf;
@@ -78,14 +78,41 @@ class SshConfigCheck implements SecurityCheck {
             : '$friendlyName is set to "$value".',
         evidence: ['$key $value'],
         timestamp: now,
+        command: 'sshd -T | grep $key',
+        recommendedAction: isReview ? recommendedAction : null,
       ));
     }
 
-    addCheck('permitrootlogin', 'Root login', reviewIf: settings['permitrootlogin'] != 'no');
-    addCheck('passwordauthentication', 'Password authentication', reviewIf: settings['passwordauthentication'] == 'yes');
-    addCheck('pubkeyauthentication', 'Public key authentication', reviewIf: settings['pubkeyauthentication'] == 'no');
-    addCheck('permitemptypasswords', 'Empty passwords', reviewIf: settings['permitemptypasswords'] != 'no');
-    addCheck('x11forwarding', 'X11 forwarding', reviewIf: settings['x11forwarding'] == 'yes');
+    addCheck(
+      'permitrootlogin',
+      'Root login',
+      reviewIf: settings['permitrootlogin'] != 'no',
+      recommendedAction: 'Consider disabling direct root login and using sudo from a named account after confirming access.',
+    );
+    addCheck(
+      'passwordauthentication',
+      'Password authentication',
+      reviewIf: settings['passwordauthentication'] == 'yes',
+      recommendedAction: 'Consider disabling password authentication after confirming SSH key access works.',
+    );
+    addCheck(
+      'pubkeyauthentication',
+      'Public key authentication',
+      reviewIf: settings['pubkeyauthentication'] == 'no',
+      recommendedAction: 'Consider enabling public key authentication as a stronger alternative to passwords.',
+    );
+    addCheck(
+      'permitemptypasswords',
+      'Empty passwords',
+      reviewIf: settings['permitemptypasswords'] != 'no',
+      recommendedAction: 'Disable empty password logins unless there is a specific, understood reason to allow them.',
+    );
+    addCheck(
+      'x11forwarding',
+      'X11 forwarding',
+      reviewIf: settings['x11forwarding'] == 'yes',
+      recommendedAction: 'Consider disabling X11 forwarding if graphical forwarding over SSH is not needed.',
+    );
 
     if (results.isEmpty) {
       results.add(SecurityCheckResult(

@@ -4,11 +4,16 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/app.dart';
+import 'app/theme/theme_mode_controller.dart';
+import 'features/settings/services/ui_preferences_controller.dart';
 import 'core/security/host_key_store.dart';
 import 'core/storage/secure_credential_store.dart';
-import 'features/browser/services/web_view_service.dart';
+import 'features/commands/services/command_library_store.dart';
 import 'features/connections/services/connection_repository.dart';
+import 'features/connections/services/server_connection_manager.dart';
 import 'features/health/services/health_service.dart';
+import 'features/health/services/health_monitor_service.dart';
+import 'features/health/models/monitoring_config.dart';
 import 'features/health/services/real_health_service.dart';
 import 'features/security/services/security_service.dart';
 import 'features/sftp/services/real_sftp_service.dart';
@@ -21,7 +26,7 @@ import 'features/transfers/services/transfer_manager.dart';
 ///
 /// Every feature screen depends only on an interface (`SshService`,
 /// `SftpService`, `ConnectionRepository`, `TransferManager`,
-/// `WebViewService`, `HostKeyStore`, `SecureCredentialStore`). This is the
+/// `HostKeyStore`, `SecureCredentialStore`). This is the
 /// ONLY file that decides which concrete implementation backs each one.
 ///
 /// `RealSshService`/`RealSftpService` (dartssh2) are wired in as the
@@ -47,7 +52,10 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         Provider<HostKeyStore>.value(value: hostKeyStore),
+        ChangeNotifierProvider<ThemeModeController>(create: (_) => ThemeModeController(prefs)),
+        ChangeNotifierProvider<UiPreferencesController>(create: (_) => UiPreferencesController(prefs)),
         Provider<SecureCredentialStore>.value(value: credentialStore),
+        Provider<CommandLibraryStore>(create: (_) => CommandLibraryStore(prefs)),
         ChangeNotifierProvider<ConnectionRepository>(
           create: (_) => PersistentConnectionRepository(prefs: prefs),
         ),
@@ -57,16 +65,27 @@ Future<void> main() async {
         Provider<SftpService>(
           create: (_) => RealSftpService(hostKeyStore: hostKeyStore, credentialStore: credentialStore),
         ),
+        ChangeNotifierProxyProvider2<SshService, SftpService, ServerConnectionManager>(
+          create: (context) => ServerConnectionManager(
+            sshService: context.read<SshService>(),
+            sftpService: context.read<SftpService>(),
+          ),
+          update: (_, __, ___, previous) => previous!,
+        ),
         ProxyProvider<SshService, HealthService>(
           update: (_, sshService, __) => RealHealthService(sshService),
+        ),
+        Provider<MonitoringConfigStore>(create: (_) => MonitoringConfigStore(prefs)),
+        ChangeNotifierProxyProvider<HealthService, HealthMonitorService>(
+          create: (context) => HealthMonitorService(context.read<HealthService>()),
+          update: (_, __, previous) => previous!,
         ),
         ProxyProvider<SshService, SecurityService>(
           update: (_, sshService, __) => SecurityService(sshService),
         ),
         ChangeNotifierProvider<TransferManager>(create: (_) => MockTransferManager()),
-        ChangeNotifierProvider<WebViewService>(create: (_) => StubWebViewService()),
       ],
-      child: const ServerKitApp(),
+      child: const ServerDrApp(),
     ),
   );
 }

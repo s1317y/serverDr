@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/theme/app_colors.dart';
-import '../../../core/widgets/serverkit_logo.dart';
+import '../../../core/widgets/serverdr_logo.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -9,26 +9,38 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('About ServerKit')),
+      appBar: AppBar(title: const Text('About ServerDr')),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Center(child: ServerKitLogo(size: 64)),
+          const Center(child: ServerDrLogo(size: 64)),
           const SizedBox(height: 12),
           const Center(
-            child: Text('ServerKit', style: TextStyle(fontFamily: 'Geist', fontSize: 20, fontWeight: FontWeight.w600)),
+            child: Text('ServerDr',
+                style: TextStyle(fontFamily: 'Geist', fontSize: 20, fontWeight: FontWeight.w600)),
           ),
           const Center(
-            child: Text('Version 0.1.0 (Phase 1)',
-                style: TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12, color: AppColors.onSurfaceVariant)),
+            child: Text('Your server doctor.',
+                style: TextStyle(
+                    fontFamily: 'Geist',
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    color: AppColors.onSurfaceVariant)),
+          ),
+          const SizedBox(height: 4),
+          const Center(
+            child: Text('Android Beta',
+                style: TextStyle(
+                    fontFamily: 'JetBrains Mono', fontSize: 12, color: AppColors.onSurfaceVariant)),
           ),
           const SizedBox(height: 20),
           const Text(
-            'A lightweight, professional IT support and server administration app. '
-            'SSH terminal, SFTP/FTP file management, remote editing, and a web '
-            'browser tab — connecting directly from your device to your '
-            'infrastructure, with no mandatory account, login, or backend.',
-            style: TextStyle(fontFamily: 'Geist', fontSize: 13, height: 1.5, color: AppColors.onSurfaceVariant),
+            'A professional IT support and server administration app. Real SSH terminal, '
+            'real SFTP file management, remote editing, a server website browser, live '
+            'health monitoring, and a security audit workspace — connecting directly from '
+            'your device to your infrastructure, with no mandatory account, login, or backend.',
+            style: TextStyle(
+                fontFamily: 'Geist', fontSize: 13, height: 1.5, color: AppColors.onSurfaceVariant),
           ),
           const SizedBox(height: 20),
           Container(
@@ -39,9 +51,11 @@ class AboutScreen extends StatelessWidget {
               border: Border.all(color: AppColors.outlineVariant),
             ),
             child: const Text(
-              'This build is Phase 1: UI and architecture only. SSH, SFTP, and FTP '
-              'sessions shown here are simulated — no data leaves this device.',
-              style: TextStyle(fontFamily: 'Geist', fontSize: 12, color: AppColors.tertiary),
+              'SSH, SFTP, host-key verification, credential storage, health collection, and '
+              'security checks connect to and run against your real, authenticated server. '
+              'FTP/FTPS and the Web SaaS dashboard are not implemented in this build.',
+              style: TextStyle(
+                  fontFamily: 'Geist', fontSize: 12, color: AppColors.onSurfaceVariant),
             ),
           ),
         ],
@@ -50,6 +64,9 @@ class AboutScreen extends StatelessWidget {
   }
 }
 
+/// Credits — the creator, plus a single link out to the auto-generated
+/// open-source license page (kept short and separate rather than a
+/// hand-maintained package-by-package list).
 class CreditsScreen extends StatelessWidget {
   const CreditsScreen({super.key});
 
@@ -58,43 +75,73 @@ class CreditsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Credits')),
       body: ListView(
-        children: const [
-          ListTile(title: Text('Flutter & Dart'), subtitle: Text('Google — BSD-3-Clause')),
-          ListTile(title: Text('go_router'), subtitle: Text('Flutter team — BSD-3-Clause')),
-          ListTile(title: Text('provider'), subtitle: Text('Remi Rousselet — MIT')),
-          ListTile(title: Text('Geist typeface'), subtitle: Text('Vercel')),
-          ListTile(title: Text('JetBrains Mono typeface'), subtitle: Text('JetBrains — Apache-2.0')),
-          ListTile(title: Text('UI design'), subtitle: Text('Generated with Google Stitch, adapted for Flutter')),
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 20, 16, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('ServerDr',
+                    style:
+                        TextStyle(fontFamily: 'Geist', fontSize: 18, fontWeight: FontWeight.w600)),
+                Text('Your server doctor.',
+                    style: TextStyle(
+                        fontFamily: 'Geist',
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.onSurfaceVariant)),
+              ],
+            ),
+          ),
+          const Divider(height: 24),
+          const ListTile(
+            title: Text('Muhammad Sibily P. S.'),
+            subtitle: Text('Creator / Developer'),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            title: const Text('Open Source Licenses'),
+            subtitle: const Text('Third-party packages this app depends on'),
+            trailing: const Icon(Icons.chevron_right, size: 18),
+            onTap: () => showLicensePage(context: context, applicationName: 'ServerDr'),
+          ),
         ],
       ),
     );
   }
 }
 
+/// Support / donation placeholder.
+///
+/// Intentionally non-functional for this beta: no payment or billing SDK
+/// is integrated, and no official support URL exists yet. The button is
+/// deliberately disabled and labeled "Coming Soon" rather than being a
+/// working-looking dead link.
 class DonateScreen extends StatelessWidget {
   const DonateScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Donate')),
-      body: const Padding(
-        padding: EdgeInsets.all(20),
+      appBar: AppBar(title: const Text('Support ServerDr')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.favorite, size: 40, color: AppColors.error),
-            SizedBox(height: 16),
-            Text(
-              'ServerKit has no account, no login, and no ads. If it\'s useful to '
-              'you, donations help keep it that way.',
+            const Icon(Icons.favorite, size: 40, color: AppColors.error),
+            const SizedBox(height: 16),
+            const Text(
+              'If ServerDr is useful to you, you can support its continued development.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontFamily: 'Geist', fontSize: 13, color: AppColors.onSurfaceVariant),
+              style: TextStyle(
+                  fontFamily: 'Geist', fontSize: 13, color: AppColors.onSurfaceVariant),
             ),
-            SizedBox(height: 20),
-            Text(
-              'Donation links aren\'t wired up in Phase 1.',
-              style: TextStyle(fontFamily: 'JetBrains Mono', fontSize: 11, color: AppColors.outline),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: null,
+              icon: Icon(Icons.favorite_border, size: 16),
+              label: Text('Coming Soon'),
             ),
           ],
         ),

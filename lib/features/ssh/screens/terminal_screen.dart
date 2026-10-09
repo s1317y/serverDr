@@ -8,10 +8,13 @@ import 'package:xterm/xterm.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/widgets/app_top_bar.dart';
-import '../../../core/widgets/server_connection_sheet.dart';
 import '../../../core/widgets/error_state_view.dart';
+import '../../../core/widgets/server_connection_sheet.dart';
 import '../../connections/models/connection_profile.dart';
+import '../../connections/models/server_connection_state.dart';
 import '../../connections/services/connection_repository.dart';
+import '../../connections/services/server_connection_manager.dart';
+import '../../settings/services/ui_preferences_controller.dart';
 import '../models/ssh_session_state.dart';
 import '../services/ssh_service.dart';
 import '../widgets/command_input_bar.dart';
@@ -21,13 +24,16 @@ import '../widgets/terminal_key_bar.dart';
 
 /// Real interactive SSH terminal.
 ///
+/// IMPORTANT: this screen does NOT auto-connect just because it's opened
+/// or the active server changes — a saved server is not a connected
+/// server (see `ServerConnectionManager`'s doc). It shows a "Not
+/// Connected" prompt with an explicit Connect action, and reattaches to
+/// an already-live session (opened from here, from Saved Connections, or
+/// left running from a previous visit) without reconnecting.
+///
 /// ANSI/VT100 handling (cursor movement, color, screen clears, full-screen
 /// programs like `vim`/`htop`) is delegated entirely to the `xterm`
-/// package's [Terminal] + [TerminalView] — this screen's job is just
-/// plumbing: pipe [SshSession.output] bytes into the terminal, and pipe
-/// the terminal's own input (typed directly into it, OR injected via the
-/// key bar / EXEC bar for mobile-friendly control keys) back out to the
-/// session.
+/// package's [Terminal] + [TerminalView].
 class TerminalScreen extends StatefulWidget {
   const TerminalScreen({super.key});
 
@@ -43,7 +49,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
   final Terminal _terminal = Terminal(maxLines: 10000);
   SshSession? _session;
   AppFailure? _failure;
-  String? _activeForConnectionId;
+  String? _attachedToId;
+  String? _lastSeenActiveId;
 
   @override
   void initState() {
@@ -60,32 +67,58 @@ class _TerminalScreenState extends State<TerminalScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final active = context.watch<ConnectionRepository>().activeConnection;
-    if (active != null && active.id != _activeForConnectionId) {
-      _activeForConnectionId = active.id;
-      _openSession(active);
+    if (active == null) {
+      _lastSeenActiveId = null;
+      return;
+    }
+    // IMPORTANT: this must only react when the ACTIVE SERVER itself
+    // changes — not on every rebuild. `build()` also watches
+    // ServerConnectionManager, so every state transition during a
+    // connect (connecting -> authenticating -> connected) triggers
+    // didChangeDependencies too. The old check here was `active.id !=
+    // _attachedToId`, which stays true for the whole connect operation
+    // and was resetting `_session` back to null mid-connect — sometimes
+    // right after a successful attach — making the first Connect tap
+    // appear to silently fail even though the SSH session had actually
+    // come up (a second attempt after leaving/returning would then just
+    // reattach to that already-live session instantly, matching the
+    // reported bug exactly). Comparing against `_lastSeenActiveId`
+    // instead makes this run only once per actual server switch.
+    if (active.id == _lastSeenActiveId) return;
+    _lastSeenActiveId = active.id;
+
+    if (active.id != _attachedToId) {
+      final existing = context.read<SshService>().sessionFor(active.id);
+      if (existing != null && existing.state == SshSessionState.connected) {
+        _attachSession(active.id, existing);
+      } else {
+        _attachedToId = null;
+        setState(() => _session = null);
+      }
     }
   }
 
-  Future<void> _openSession(ConnectionProfile profile) async {
+  Future<void> _connect(ConnectionProfile profile) async {
     setState(() {
       _failure = null;
-      _session = null;
     });
-    _terminal.buffer.clear();
     try {
-      final sshService = context.read<SshService>();
-      final session = await sshService.connect(
-        profile,
-        onHostKeyVerification: (request) => showHostKeyVerificationDialog(context, request),
-      );
-      if (!mounted) return;
-      setState(() => _session = session);
-      session.stateStream.listen((_) => mounted ? setState(() {}) : null);
-      session.output.transform(const Utf8Decoder(allowMalformed: true)).listen(_terminal.write);
+      final manager = context.read<ServerConnectionManager>();
+      await manager.connect(profile, onHostKeyVerification: (r) => showHostKeyVerificationDialog(context, r));
+      final session = context.read<SshService>().sessionFor(profile.id);
+      if (session != null) _attachSession(profile.id, session);
     } on AppFailure catch (f) {
       if (!mounted) return;
       setState(() => _failure = f);
     }
+  }
+
+  void _attachSession(String profileId, SshSession session) {
+    _attachedToId = profileId;
+    _terminal.buffer.clear();
+    setState(() => _session = session);
+    session.stateStream.listen((_) => mounted ? setState(() {}) : null);
+    session.output.transform(const Utf8Decoder(allowMalformed: true)).listen(_terminal.write);
   }
 
   Future<void> _submitLine() async {
@@ -105,11 +138,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
   }
 
   Future<void> _openPalette() async {
-    final picked = await showCommandPaletteSheet(context);
-    if (picked == null) return;
+    final resolved = await showCommandPaletteSheet(context);
+    if (resolved == null) return;
     setState(() {
-      _inputController.text = picked.command;
-      _inputController.selection = TextSelection.collapsed(offset: picked.command.length);
+      _inputController.text = resolved;
+      _inputController.selection = TextSelection.collapsed(offset: resolved.length);
     });
   }
 
@@ -123,6 +156,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   Widget build(BuildContext context) {
     final connections = context.watch<ConnectionRepository>();
     final active = connections.activeConnection;
+    context.watch<ServerConnectionManager>(); // rebuild on state changes
 
     return Scaffold(
       appBar: AppTopBar(
@@ -149,14 +183,46 @@ class _TerminalScreenState extends State<TerminalScreen> {
       return ErrorStateView(
         failure: _failure!,
         actions: [
-          RecoveryAction(label: 'Retry', isPrimary: true, onPressed: () => _openSession(active)),
+          RecoveryAction(label: 'Retry', isPrimary: true, onPressed: () => _connect(active)),
           RecoveryAction(label: 'Edit Connection', onPressed: () => context.push('/connections/${active.id}/edit')),
         ],
       );
     }
+
     final session = _session;
-    if (session == null) {
-      return const LoadingStateView(label: 'Connecting...');
+    if (session == null || session.state != SshSessionState.connected) {
+      final manager = context.watch<ServerConnectionManager>();
+      final connecting = manager.stateFor(active.id).isTransient;
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.terminal, size: 40, color: AppColors.outline),
+              const SizedBox(height: 12),
+              Text(
+                connecting ? 'Connecting...' : 'Not connected',
+                style: const TextStyle(fontFamily: 'Geist', fontSize: 15, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${active.username}@${active.host}:${active.port}',
+                style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12, color: AppColors.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              if (connecting)
+                const CircularProgressIndicator()
+              else
+                FilledButton.icon(
+                  onPressed: () => _connect(active),
+                  icon: const Icon(Icons.power_settings_new, size: 18),
+                  label: const Text('Connect'),
+                ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Column(
@@ -170,6 +236,19 @@ class _TerminalScreenState extends State<TerminalScreen> {
               autofocus: true,
               backgroundOpacity: 0,
               padding: const EdgeInsets.all(8),
+              textStyle: TerminalStyle(
+                fontFamily: 'JetBrains Mono',
+                fontSize: context.watch<UiPreferencesController>().terminalFontSize,
+              ),
+              // Android soft keyboards frequently don't send Backspace as
+              // a raw hardware key event (especially Gboard/Samsung
+              // Keyboard predictive-text modes) — they signal deletion
+              // through the IME's text-editing state instead. Without
+              // this, typing works but Backspace silently does nothing,
+              // which is exactly the reported bug. This makes TerminalView
+              // additionally watch the IME composing/editing state for
+              // deletions rather than relying solely on raw key events.
+              deleteDetection: true,
             ),
           ),
         ),

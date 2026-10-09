@@ -1,192 +1,160 @@
-# ServerKit
+# ServerDr
 
-Lightweight professional IT support / server administration app (Flutter,
-Android-first). This phase moves SSH and SFTP from mock to **real**
-networking; FTP/FTPS stays mocked/UI-only per the phase boundary.
+**Your server doctor.**
 
-## Before you run it — Android manifest
+ServerDr is a mobile-first server administration, monitoring and security app for Android. Connect straight from your phone to your Linux servers over SSH and SFTP, with no account, no cloud backend and no telemetry.
 
-This repo does not ship an `android/` folder (see "Getting it running"
-below for why). Once you generate one, **you must add the INTERNET
-permission** — without it every SSH/SFTP socket connect will fail
-immediately:
+> **Status: Android beta.** It has been tested on real Android devices against real Linux servers. Expect rough edges. See [Known limitations](#known-limitations).
 
-```xml
-<!-- android/app/src/main/AndroidManifest.xml -->
-<manifest ...>
-    <uses-permission android:name="android.permission.INTERNET" />
-    <application ...>
-```
+<!-- Add screenshots here, e.g.:
+<p align="center">
+  <img src="docs/screenshots/terminal.png" width="220" />
+  <img src="docs/screenshots/files.png" width="220" />
+  <img src="docs/screenshots/health.png" width="220" />
+  <img src="docs/screenshots/security.png" width="220" />
+</p>
+-->
 
-Debug builds usually get this for free from Flutter tooling; **release
-builds do not** unless it's explicitly in the manifest. No other special
-permission is needed — `file_picker` uses Android's Storage Access
-Framework, which needs no manifest entry or runtime permission grant.
+## Features
 
-**Also bump `compileSdk` to 36.** `file_picker`'s transitive
-`flutter_plugin_android_lifecycle` dependency requires compiling against
-API 36+. This is NOT just your app module's setting — plugin subprojects
-(like `file_picker` itself) compile against a separate shared value,
-`flutter.compileSdkVersion`, that Flutter's tooling injects into every
-plugin's Gradle build. Editing `android/app/build.gradle.kts`'s
-`compileSdk` alone won't fix a "plugin requires newer API" error for that
-reason. Instead, add this to `android/local.properties`:
+### Connections
+- Saved server profiles with password or SSH private-key authentication
+- Private keys are chosen through the Android file picker (no pasting key text)
+- **Test Connection** before saving
+- Explicit connect and disconnect per server, with real connection state (Disconnected, Connecting, Connected, Reconnecting, Connection Failed, Authentication Failed, Host Verification Required)
+- A saved server is never shown as connected unless it really is
 
-```
-flutter.compileSdkVersion=36
-```
+### Terminal
+- Real interactive SSH shell with full ANSI/VT100 support
+- Mobile key bar: Ctrl+C/D/L/Z, Tab, Esc, arrows and common symbols
+- Command palette with **146 commands across 26 categories**
+  - Search, favorites and recent commands
+  - Parameterized commands such as `systemctl status {service}`
+  - Confirmation required for dangerous commands (reboot, `rm -rf`, `docker system prune` and similar)
+  - Recent history skips anything that looks like it contains a secret
 
-then `flutter clean && flutter pub get` before rebuilding. If your Flutter
-SDK doesn't honor that property, `flutter upgrade` is the more durable
-fix — recent Flutter versions default higher already, so this stops
-coming up as plugins update.
+### Files (SFTP)
+- Browse, open, upload, download, rename, create folders and files, delete (folders are deleted recursively)
+- Per-item action menus for files and directories
+- Remote text editor that reads and writes the real file
+  - Unsaved-changes tracking and a Save / Discard / Cancel prompt on exit
+  - Failed saves keep your edits and show the actual error
+- Transfer manager with real progress for uploads and downloads
 
-## Getting it running
+### Web
+- In-app browser for your server's website
+- Normal reload, plus **Hard Reload (No Cache)**, which clears the WebView cache and adds a cache-busting parameter
+- Cookies are only cleared when you explicitly ask
 
-Same as before — this sandbox has no Flutter/Dart SDK, so none of this
-has been run through `flutter analyze` / `flutter build` / `flutter run`.
-That matters more this time than last: this phase integrates a real
-third-party protocol library (`dartssh2`) whose exact method/property
-names I confirmed from published docs and its official `xterm` pairing
-example, but could not compile-check. Treat your first local build as
-the real test — see "Known limitations" below for the specific spots
-most likely to need a small fix, and paste me any compiler errors.
+### Health
+- Health collected from inside the server over your existing SSH connection (not an external ping)
+- Uptime, CPU load, memory, disk and inode usage, load average, top processes, services and network interfaces
+- If one metric can't be collected (permissions, missing tools), the rest still load
+- **Monitoring** for multiple servers: per-server opt-in, refresh intervals from manual to 1 hour, calculated status (Good / Review / Warning / Offline / Unknown)
+- Honest freshness: every server shows when it was last checked, and the last known data stays visible when a server goes offline
 
-1. Generate the platform folders (unchanged from before):
-   ```bash
-   flutter create --org com.yourcompany --project-name serverkit scratch
-   cp -r scratch/android ./android
-   rm -rf scratch
-   ```
-2. Add the INTERNET permission above.
-3. `flutter pub get`
-4. `flutter run`
+### Security
+A lightweight, read-only audit of the connected server:
+- Authentication log analysis (failed logins, invalid users, root logins, sudo activity)
+- Listening ports
+- SSH daemon configuration
+- User accounts (UID 0, login-capable, sudo/wheel groups)
+- Persistence (cron, systemd timers, `authorized_keys`)
+- Sensitive file permissions
+- Package activity (apt, dnf, apk)
+- Docker (containers, privileged containers)
 
-## What's real now vs. still mocked
+Each finding has a detail view with evidence, the command used and a recommended action, and results can be exported as JSON through the Android share sheet.
 
-| Area | Status |
-|---|---|
-| SSH connect/auth (password + private key) | **Real** — `dartssh2` |
-| SSH interactive terminal | **Real** — `dartssh2` pty + `xterm` renderer |
-| SSH host-key verification (new + changed) | **Real** — persisted via secure storage |
-| SFTP connect/list/read/write/rename/delete/mkdir | **Real** — `dartssh2` |
-| SFTP download/upload | **Real**, in-memory (not chunked-streamed — fine for config/log-sized files; very large files aren't streamed to disk incrementally yet) |
-| Secure credential storage (password/key/passphrase) | **Real** — Android Keystore via `flutter_secure_storage` |
-| Saved connection profiles | **Real**, persisted via `shared_preferences` (secrets excluded — those live in secure storage) |
-| Test Connection | **Real** — goes through the same `SshService.testConnection` real auth path |
-| Transfer Manager UI | **Real progress** for SFTP downloads/uploads triggered from the Files screen; the "2 seed transfers" demo data still self-simulates for UI polish — see `MockTransferManager` |
-| Command Palette / dangerous-command confirmation | UI complete, real (no networking involved — inserts into the real command input) |
-| FTP/FTPS | Still mocked/UI-only — explicitly out of scope per the phase boundary |
-| Web browser tab | Still stub navigation state, no real WebView — out of scope per the phase boundary |
-| Quick Connect (ephemeral, no saved profile) | **Not implemented this phase** — only saved-profile connect exists |
-| Editor syntax highlighting | Still absent (was already a known Phase 1 gap) |
+**This is an audit aid, not antivirus, EDR or a vulnerability scanner.** Findings are labelled PASS, INFO, REVIEW or WARNING and need a human to interpret them. An open port is not automatically a vulnerability, and a changed file is not automatically malware.
 
-## Status-bar fix
+## Security and privacy
 
-Root cause: the custom `AppTopBar` was a raw `Container` in a
-hand-rolled `PreferredSizeWidget`, so it never got Flutter's built-in
-top-inset handling. Fixed by rebuilding it as a real `AppBar` (which
-handles the system status-bar inset internally) plus
-`SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge)` and an
-`AnnotatedRegion<SystemUiOverlayStyle>` around the app root for icon
-contrast. No screen has a manual top-padding number anywhere — this
-should hold across phones, tall status bars, and notches without
-per-screen tweaks.
+- **No account, no backend, no analytics.** The app connects directly from your device to your servers.
+- **Credentials** (passwords, private keys, passphrases) are stored with `flutter_secure_storage` (Android Keystore-backed), never in SharedPreferences or plain files.
+- **Host-key verification is always on.** Unknown hosts show a fingerprint prompt, and a changed host key stops the connection with a clear warning. There is no "ignore" shortcut. Trusted hosts can be reviewed and removed under Settings → Known SSH Hosts.
+- Health and security checks are **read-only**. Commands that modify a server need explicit confirmation.
+- Passwords, keys and passphrases are never logged.
 
-## Dependencies added this phase
+## Requirements
 
-See `pubspec.yaml` — every dependency has an inline comment explaining
-what it's for, why it was chosen over alternatives, and its known
-limitations (`dartssh2`, `xterm`, `flutter_secure_storage`, `file_picker`,
-`shared_preferences`).
+- Flutter SDK (Dart `>=3.3.0 <4.0.0`)
+- Android device or emulator
+- A Linux server reachable over SSH (tested with standard OpenSSH servers)
 
-## Architecture changes worth knowing about
-
-- **`SshSession`'s shape changed** from Phase 1's structured
-  "entries" list (lines, tables, ...) to a raw byte stream. A real
-  interactive shell's output contains ANSI/VT100 escape sequences that
-  only a real terminal emulator can correctly interpret — trying to
-  model that as discrete "lines" (as the old mock did) cannot represent
-  a real shell. `MockSshService` was **removed** rather than rewritten
-  to the new shape, since a byte-stream-emitting mock would need to
-  synthesize believable ANSI sequences to be useful, which felt like
-  scope better spent on the real path. `MockSftpService` was **kept** —
-  its interface didn't need to change shape, so it's still available as
-  a demo/offline fallback behind the same `SftpService` interface.
-- **Host-key verification is a callback the UI supplies**, not something
-  the service resolves internally: `SshService.connect`/`SftpService.connect`
-  take an `onHostKeyVerification` handler. The Terminal screen, Files
-  screen, and connection editor's Test Connection each pass their own
-  (all rendering the same `showHostKeyVerificationDialog`). This keeps
-  the networking layer decoupled from navigation/`BuildContext`.
-- **SSH and SFTP open separate connections** for the same server profile
-  — there's no shared/pooled `SSHClient` between the Terminal and Files
-  tabs yet. Both go through the same `HostKeyStore`, so trusting a host
-  from either screen trusts it for both; they just don't share the
-  socket. Worth revisiting if connection setup latency becomes
-  noticeable in practice.
-
-## Known limitations / most likely spots to need a fix on first build
-
-I confirmed `dartssh2`'s API from its published docs and its official
-paired `xterm` example (`SSHClient`, `onVerifyHostKey`, `client.shell(pty:)`,
-`SSHSession.write`/`.resizeTerminal`, `SftpClient.open`/`.readBytes`/
-`.writeBytes`/`.listdir`/`.rename`/`.remove`/`.mkdir`), but a few details
-were reasonable inferences rather than confirmed against a real compile:
-
-- `SftpStatusCode` enum member names (`noSuchFile`, `permissionDenied`,
-  `opUnsupported`) — the underlying SFTP protocol codes are standard, but
-  I'm not 100% certain of dartssh2's exact Dart enum naming.
-- `SftpFileOpenMode.create | .write | .truncate` — assumed this is a
-  bitwise-flags type supporting `|`.
-- `SSHPtyConfig(width:, height:)` and `Terminal(maxLines:)` /
-  `TerminalView(..., backgroundOpacity:, padding:)` parameter names.
-- `SSHKeyPair.fromPem(pem, passphrase)`'s exact handling of a wrong
-  passphrase (mapped to `SSHKeyDecryptError` based on the class list
-  description, which is somewhat ambiguous).
-
-None of these are architectural risks — if `flutter analyze` flags any
-of them, it'll be a one-line property/enum-name fix, not a redesign.
-Paste me the errors and I'll fix them directly.
-
-Also unimplemented/simplified vs. the full brief:
-- No OpenSSH "randomart" ASCII art on the host-verification dialog (SHA256
-  fingerprint text is there; the decorative art box from the Stitch shot
-  isn't).
-- SFTP download/upload load the whole file into memory rather than
-  streaming to disk incrementally — fine for config/log files, a real
-  risk for multi-GB transfers.
-- "Clear Session Data" in Settings is still a UI-only placeholder.
-- No automated tests yet (see the brief's testing section) — next up if
-  you want this phase to also cover that before moving on.
-
-## Commands
+## Build and run
 
 ```bash
-flutter pub get       # install dependencies
-flutter analyze        # static analysis — run this first after pub get
-flutter run            # run on a connected device/emulator
+git clone <your-repo-url>
+cd serverdr
+
+flutter pub get
+dart run flutter_launcher_icons   # generates the launcher icons
+flutter run
 ```
 
-No test suite exists yet in this phase (see "Known limitations").
+Make sure `android/app/src/main/AndroidManifest.xml` includes the network permission, otherwise release builds can't open sockets:
 
-## Testing SSH/SFTP manually
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
 
-1. Add a connection profile pointing at a real Ubuntu/Debian/Rocky/Alma
-   box you control, with either password or private-key auth.
-2. Tap **Test Connection** in the editor before saving — this exercises
-   the exact same auth path as the real terminal/SFTP screens.
-3. First connect to a never-before-seen host: expect the "New SSH Host
-   Verification" dialog with a `SHA256:...` fingerprint. Compare it
-   against `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` (or
-   equivalent) run directly on the server.
-4. To test the changed-host-key path: `ssh-keygen -R <host>` locally
-   won't affect this app (it has its own store); instead, regenerate the
-   server's host key (`ssh-keygen -A` after removing
-   `/etc/ssh/ssh_host_*` on a test box) and reconnect — expect the red
-   "SSH Host Key Changed" dialog with Disconnect as the safe default.
-5. Wrong password / wrong key / wrong passphrase should each surface a
-   distinct error via `ErrorStateView` rather than a generic failure.
-6. In Files, open a small text file, edit it, Save, then re-open it (or
-   check it directly on the server) to confirm the write actually landed
-   remotely — this is real now, not the Phase 1 mock buffer.
+Some plugins require a recent `compileSdk` (36 at the time of writing). If Gradle complains, update `compileSdk` in your Android project, or upgrade Flutter.
+
+To check the project:
+
+```bash
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+## Tech stack
+
+| Area | Package |
+|---|---|
+| SSH and SFTP | [`dartssh2`](https://pub.dev/packages/dartssh2) |
+| Terminal emulator | [`xterm`](https://pub.dev/packages/xterm) |
+| Secure credential storage | [`flutter_secure_storage`](https://pub.dev/packages/flutter_secure_storage) |
+| Key file selection and file picking | [`file_picker`](https://pub.dev/packages/file_picker) |
+| In-app browser | [`webview_flutter`](https://pub.dev/packages/webview_flutter) |
+| Export and sharing | [`share_plus`](https://pub.dev/packages/share_plus) |
+| Navigation | [`go_router`](https://pub.dev/packages/go_router) |
+| State management | [`provider`](https://pub.dev/packages/provider) |
+| Local preferences | [`shared_preferences`](https://pub.dev/packages/shared_preferences) |
+
+Networking sits behind service interfaces (`SshService`, `SftpService`, `HealthService` and others), so screens don't depend on a specific SSH library.
+
+## Known limitations
+
+- **Android only.** iOS and Web are not supported. Browsers can't open raw SSH/SFTP sockets, so a web version would need a different architecture.
+- **FTP/FTPS is not implemented.**
+- **Light theme is not functional yet.** The Dark/Light/System setting exists, but Light currently renders the same as Dark. Making every custom surface theme-aware is planned work.
+- **No true background monitoring.** Scheduled checks only run while the app process is alive. Android may suspend or kill the app, and the UI shows the real last-checked time instead of implying live monitoring. WorkManager-based scheduling is future work.
+- **Push notifications and alerting are not implemented.**
+- **SFTP downloads and uploads run in memory,** so very large files are not streamed to disk.
+- SFTP and the terminal use separate SSH connections to the same server.
+- Not yet built: log explorer, recent-file-change diffing, web log analysis, custom security checks, per-container Docker health.
+
+## Roadmap
+
+Planned, but not implemented in this build:
+
+- Full light theme
+- Background monitoring and alert notifications
+- Log explorer and file-change analysis
+- Streamed large-file transfers
+- Further platforms
+
+## Contributing
+
+Issues and pull requests are welcome. Please open an issue first to discuss larger changes.
+
+## License
+
+<!-- Add a LICENSE file and state it here, e.g. "MIT — see LICENSE". -->
+Not yet specified.
+
+## Author
+
+**Muhammad Sibily P. S.** — Creator / Developer

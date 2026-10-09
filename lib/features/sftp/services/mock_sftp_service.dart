@@ -189,7 +189,7 @@ server {
 version: "3.9"
 services:
   api-gateway:
-    image: serverkit/api-gateway:latest
+    image: serverdr/api-gateway:latest
     ports:
       - "443:443"
 ''',

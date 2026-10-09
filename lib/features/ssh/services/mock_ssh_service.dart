@@ -95,7 +95,7 @@ class _MockSshSession implements SshSession {
     }
     _setState(SshSessionState.authenticating);
     _setState(SshSessionState.connected);
-    _write('Welcome to ServerKit mock SSH for ${profile.name}\r\n');
+    _write('Welcome to ServerDr mock SSH for ${profile.name}\r\n');
     _write('${profile.username}@${profile.host}:~\$ ');
   }
 

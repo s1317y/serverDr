@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
 import '../../features/connections/models/connection_profile.dart';
-import 'serverkit_logo.dart';
+import 'serverdr_logo.dart';
 import 'status_dot.dart';
 
 /// The header shared by every top-level screen in the Stitch prototypes:
@@ -36,8 +36,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onTapConnections;
   final VoidCallback? onTapTransfers;
 
-  /// Opens Settings/About — the profile avatar took over this job once
-  /// Settings moved off the bottom nav to make room for Health/Security.
+  /// Opens Settings — a gear icon, not a profile/account metaphor, since
+  /// ServerDr has no account system.
   final VoidCallback? onTapProfile;
   final int pendingTransfers;
 
@@ -58,7 +58,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       shape: const Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       title: Row(
         children: [
-          ServerKitBrandLockup(sectionLabel: sectionLabel),
+          ServerDrBrandLockup(sectionLabel: sectionLabel),
           const SizedBox(width: 8),
           Expanded(
             child: Center(
@@ -85,14 +85,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 4),
         Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: InkWell(
-            onTap: onTapProfile,
-            customBorder: const CircleBorder(),
-            child: const CircleAvatar(
-              radius: 16,
-              backgroundColor: AppColors.primary,
-              child: Icon(Icons.person, size: 18, color: AppColors.onPrimary),
-            ),
+          child: IconButton(
+            onPressed: onTapProfile,
+            tooltip: 'Settings',
+            icon: const Icon(Icons.settings_outlined, size: 22, color: AppColors.onSurfaceVariant),
           ),
         ),
       ],

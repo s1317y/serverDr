@@ -28,7 +28,15 @@ Future<String?> showTextPromptDialog(
       ],
     ),
   );
-  controller.dispose();
+  // Defer disposal to the next frame rather than disposing immediately.
+  // showDialog's Future resolves as soon as Navigator.pop() is CALLED —
+  // not when the dialog's exit animation finishes — so the TextField
+  // above can still be attached to `controller` during that trailing
+  // animation frame. Disposing synchronously here was racing that
+  // teardown and triggering a framework element-lifecycle assertion
+  // ('_dependents.isEmpty') on New Folder / New File / Rename, the only
+  // three places that use this dialog.
+  WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
   if (result == null || result.isEmpty) return null;
   return result;
 }

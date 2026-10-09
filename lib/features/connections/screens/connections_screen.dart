@@ -6,19 +6,40 @@ import '../../../app/theme/app_colors.dart';
 import '../../../core/storage/secure_credential_store.dart';
 import '../../../core/utils/relative_time.dart';
 import '../../../core/widgets/error_state_view.dart';
+import '../../ssh/widgets/host_key_verification_dialog.dart';
 import '../models/connection_profile.dart';
+import '../models/server_connection_state.dart';
 import '../services/connection_repository.dart';
+import '../services/server_connection_manager.dart';
 
-/// Saved Connections list. Each card offers direct SSH / Files / Web
-/// shortcuts (selecting one sets this profile active and jumps to that
-/// tab) plus Edit/Delete, matching the new Stitch "Saved Connections"
-/// screen.
+/// Saved Connections list.
+///
+/// IMPORTANT: the connection-status dot here reflects REAL live state
+/// from [ServerConnectionManager] — never "this profile is the selected
+/// one" (that was the bug: a saved/selected server is not a connected
+/// server). Opening this screen never connects anything by itself.
 class ConnectionsScreen extends StatelessWidget {
   const ConnectionsScreen({super.key});
 
   void _openTab(BuildContext context, ConnectionRepository repo, ConnectionProfile c, String route) {
     repo.setActive(c.id);
     context.go(route);
+  }
+
+  Future<void> _connect(BuildContext context, ConnectionProfile c) async {
+    try {
+      await context.read<ServerConnectionManager>().connect(
+            c,
+            onHostKeyVerification: (r) => showHostKeyVerificationDialog(context, r),
+          );
+    } catch (_) {
+      // Failure state is already recorded by the manager and shown via
+      // the status dot/label; nothing else to do here.
+    }
+  }
+
+  Future<void> _disconnect(BuildContext context, ConnectionProfile c) async {
+    await context.read<ServerConnectionManager>().disconnect(c.id);
   }
 
   Future<void> _delete(BuildContext context, ConnectionProfile c) async {
@@ -38,13 +59,15 @@ class ConnectionsScreen extends StatelessWidget {
       ),
     );
     if (confirmed != true || !context.mounted) return;
+    await context.read<ServerConnectionManager>().disconnect(c.id);
     await context.read<SecureCredentialStore>().clearAll(c.id);
-    await context.read<ConnectionRepository>().delete(c.id);
+    if (context.mounted) await context.read<ConnectionRepository>().delete(c.id);
   }
 
   @override
   Widget build(BuildContext context) {
     final repo = context.watch<ConnectionRepository>();
+    final manager = context.watch<ServerConnectionManager>();
     return Scaffold(
       appBar: AppBar(title: const Text('Saved Connections')),
       body: repo.connections.isEmpty
@@ -59,12 +82,13 @@ class ConnectionsScreen extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final c = repo.connections[index];
-                final isActive = repo.activeConnection?.id == c.id;
+                final state = manager.stateFor(c.id);
+                final isSelected = repo.activeConnection?.id == c.id;
                 return Container(
                   decoration: BoxDecoration(
-                    color: isActive ? AppColors.surfaceContainerHigh : AppColors.surfaceContainer,
+                    color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainer,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: isActive ? AppColors.primary : AppColors.outlineVariant),
+                    border: Border.all(color: isSelected ? AppColors.primary : AppColors.outlineVariant),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
@@ -73,15 +97,8 @@ class ConnectionsScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                color: isActive ? AppColors.secondary : AppColors.outline,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                            _statusDot(state),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(c.name,
                                   style: const TextStyle(fontFamily: 'Geist', fontSize: 14, fontWeight: FontWeight.w600)),
@@ -104,9 +121,24 @@ class ConnectionsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          '${c.username}@${c.host}:${c.port}',
-                          style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 11, color: AppColors.onSurfaceVariant),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                '${c.username}@${c.host}:${c.port}',
+                                style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 11, color: AppColors.onSurfaceVariant),
+                              ),
+                            ),
+                            Text(
+                              state.label,
+                              style: TextStyle(
+                                fontFamily: 'JetBrains Mono',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: _statusColor(state),
+                              ),
+                            ),
+                          ],
                         ),
                         if (c.lastConnectedAt != null)
                           Text(
@@ -116,19 +148,24 @@ class ConnectionsScreen extends StatelessWidget {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            _actionChip(
-                              context,
-                              icon: Icons.terminal,
-                              label: 'SSH',
-                              onTap: () => _openTab(context, repo, c, '/terminal'),
-                            ),
+                            if (state.isTransient)
+                              const SizedBox(width: 78, height: 28, child: Center(child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))))
+                            else if (state == ServerConnectionState.connected)
+                              _actionChip(context, icon: Icons.link_off, label: 'Disconnect', tint: AppColors.error, onTap: () => _disconnect(context, c))
+                            else
+                              _actionChip(context, icon: Icons.power_settings_new, label: 'Connect', tint: AppColors.secondary, onTap: () => _connect(context, c)),
                             const SizedBox(width: 6),
-                            _actionChip(
-                              context,
-                              icon: Icons.folder_outlined,
-                              label: 'Files',
-                              onTap: () => _openTab(context, repo, c, '/files'),
-                            ),
+                            _actionChip(context, icon: Icons.terminal, label: 'SSH', onTap: () => _openTab(context, repo, c, '/terminal')),
+                            const SizedBox(width: 6),
+                            _actionChip(context, icon: Icons.folder_outlined, label: 'Files', onTap: () => _openTab(context, repo, c, '/files')),
+                            const SizedBox(width: 6),
+                            _actionChip(context, icon: Icons.monitor_heart_outlined, label: 'Health', onTap: () => context.push('/health/${c.id}')),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            _actionChip(context, icon: Icons.shield_outlined, label: 'Security', onTap: () => _openTab(context, repo, c, '/security')),
                             const SizedBox(width: 6),
                             _actionChip(
                               context,
@@ -162,7 +199,31 @@ class ConnectionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _actionChip(BuildContext context, {required IconData icon, required String label, required VoidCallback onTap, bool enabled = true}) {
+  Color _statusColor(ServerConnectionState state) => switch (state) {
+        ServerConnectionState.connected => AppColors.secondary,
+        ServerConnectionState.connecting || ServerConnectionState.reconnecting => AppColors.tertiary,
+        ServerConnectionState.connectionFailed ||
+        ServerConnectionState.authenticationFailed ||
+        ServerConnectionState.hostVerificationRequired =>
+          AppColors.error,
+        ServerConnectionState.disconnected => AppColors.outline,
+      };
+
+  Widget _statusDot(ServerConnectionState state) {
+    final color = _statusColor(state);
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: state == ServerConnectionState.connected ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 6)] : null,
+      ),
+    );
+  }
+
+  Widget _actionChip(BuildContext context,
+      {required IconData icon, required String label, required VoidCallback onTap, bool enabled = true, Color? tint}) {
     return Material(
       color: AppColors.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(4),
@@ -176,9 +237,9 @@ class ConnectionsScreen extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, size: 14, color: AppColors.onSurface),
+                Icon(icon, size: 14, color: tint ?? AppColors.onSurface),
                 const SizedBox(width: 4),
-                Text(label, style: const TextStyle(fontFamily: 'Geist', fontSize: 11, color: AppColors.onSurface)),
+                Text(label, style: TextStyle(fontFamily: 'Geist', fontSize: 11, color: tint ?? AppColors.onSurface)),
               ],
             ),
           ),

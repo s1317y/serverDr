@@ -1,58 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../../app/theme/theme_mode_controller.dart';
+import '../services/ui_preferences_controller.dart';
 
-class SettingsScreen extends StatefulWidget {
+/// Real, functional Settings. Every control here either genuinely works
+/// (and is wired to a controller/persisted value) or is explicitly
+/// labeled "Coming soon" — per the brief, no fake toggles that look
+/// functional but silently do nothing.
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkMode = true; // Dark-first design; no light theme exists yet.
-  double _fontSize = 13;
-  String _terminalFont = 'JetBrains Mono';
-
-  @override
   Widget build(BuildContext context) {
+    final themeController = context.watch<ThemeModeController>();
+    final uiPrefs = context.watch<UiPreferencesController>();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          const _SectionHeader('Appearance'),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            subtitle: const Text('ServerKit is dark-first; a light theme isn\'t built yet'),
-            value: _darkMode,
-            onChanged: (v) => setState(() => _darkMode = v),
-          ),
-          const _SectionHeader('Terminal'),
+          _SectionHeader('Appearance'),
           ListTile(
-            title: const Text('Font Size'),
-            subtitle: Slider(
-              value: _fontSize,
-              min: 10,
-              max: 18,
-              divisions: 8,
-              label: _fontSize.round().toString(),
-              onChanged: (v) => setState(() => _fontSize = v),
-            ),
-          ),
-          ListTile(
-            title: const Text('Terminal Font'),
-            trailing: DropdownButton<String>(
-              value: _terminalFont,
+            title: const Text('Theme'),
+            subtitle: Text(_themeLabel(themeController.mode)),
+            trailing: DropdownButton<ThemeMode>(
+              value: themeController.mode,
+              underline: const SizedBox.shrink(),
               items: const [
-                DropdownMenuItem(value: 'JetBrains Mono', child: Text('JetBrains Mono')),
-                DropdownMenuItem(value: 'Fira Code', child: Text('Fira Code')),
-                DropdownMenuItem(value: 'System Monospace', child: Text('System Monospace')),
+                DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark')),
+                DropdownMenuItem(value: ThemeMode.light, child: Text('Light')),
+                DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
               ],
-              onChanged: (v) => setState(() => _terminalFont = v!),
+              onChanged: (mode) => themeController.setMode(mode!),
             ),
           ),
-          const _SectionHeader('Security'),
+          ListTile(
+            title: const Text('UI Scale'),
+            subtitle: Text(uiPrefs.uiScale.label),
+            trailing: DropdownButton<UiScale>(
+              value: uiPrefs.uiScale,
+              underline: const SizedBox.shrink(),
+              items: UiScale.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label))).toList(),
+              onChanged: (s) => uiPrefs.setUiScale(s!),
+            ),
+          ),
+          ListTile(
+            title: const Text('Terminal Font Size'),
+            subtitle: Slider(
+              value: uiPrefs.terminalFontSize,
+              min: 10,
+              max: 20,
+              divisions: 10,
+              label: uiPrefs.terminalFontSize.round().toString(),
+              onChanged: (v) => uiPrefs.setTerminalFontSize(v),
+            ),
+          ),
+          ListTile(
+            title: const Text('Editor Font Size'),
+            subtitle: Slider(
+              value: uiPrefs.editorFontSize,
+              min: 10,
+              max: 20,
+              divisions: 10,
+              label: uiPrefs.editorFontSize.round().toString(),
+              onChanged: (v) => uiPrefs.setEditorFontSize(v),
+            ),
+          ),
+          const _ComingSoonTile(title: 'Font Family', subtitle: 'Geist (UI) / JetBrains Mono (terminal & code) — bundled fonts not yet included in this build; system fallback is used'),
+
+          _SectionHeader('Connections'),
+          const _ComingSoonTile(title: 'SSH / SFTP Defaults', subtitle: 'Default port, keepalive interval'),
+          const _ComingSoonTile(title: 'Connection Timeout', subtitle: 'Currently fixed at 15 seconds'),
+
+          _SectionHeader('Security'),
           ListTile(
             leading: const Icon(Icons.vpn_key_outlined),
             title: const Text('Known SSH Hosts'),
@@ -60,47 +83,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/settings/known-hosts'),
           ),
-          ListTile(
-            leading: const Icon(Icons.delete_sweep_outlined, color: AppColors.error),
-            title: const Text('Clear Session Data'),
-            subtitle: const Text('Removes cached sessions and mock credentials on this device'),
-            onTap: () => _confirmClearSession(context),
-          ),
-          const _SectionHeader('Application'),
-          const ListTile(title: Text('Check for Updates'), trailing: Icon(Icons.chevron_right)),
-          const ListTile(title: Text('Version'), trailing: Text('0.1.0 (Phase 1)')),
-          const _SectionHeader('Support'),
+          const _ComingSoonTile(title: 'Confirmation Behavior', subtitle: 'Dangerous commands always require confirmation — not yet configurable'),
+
+          _SectionHeader('Monitoring'),
+          const _ComingSoonTile(title: 'Default Monitoring Interval', subtitle: 'Configure per-server from that server\'s Health screen for now'),
+          const _ComingSoonTile(title: 'Stale Threshold', subtitle: 'Currently fixed at 10 minutes'),
+
+          _SectionHeader('Storage'),
+          const _ComingSoonTile(title: 'Command History Retention', subtitle: 'Currently fixed at the last 20 commands'),
+
+          _SectionHeader('Support'),
           ListTile(
             leading: const Icon(Icons.favorite_border, color: AppColors.error),
-            title: const Text('Donate'),
+            title: const Text('Support ServerDr'),
             onTap: () => context.push('/about/donate'),
           ),
-          const _SectionHeader('About'),
-          ListTile(title: const Text('About ServerKit'), onTap: () => context.push('/about')),
+
+          _SectionHeader('About'),
+          ListTile(title: const Text('About ServerDr'), onTap: () => context.push('/about')),
           ListTile(title: const Text('Credits'), onTap: () => context.push('/about/credits')),
-          ListTile(
-            title: const Text('Open Source Licenses'),
-            onTap: () => showLicensePage(context: context, applicationName: 'ServerKit'),
-          ),
           const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  void _confirmClearSession(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear session data?'),
-        content: const Text('This clears cached mock sessions on this device. It does not affect any real server.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Clear')),
-        ],
-      ),
-    );
-  }
+  String _themeLabel(ThemeMode mode) => switch (mode) {
+        ThemeMode.dark => 'Dark',
+        ThemeMode.light => 'Light',
+        ThemeMode.system => 'System',
+      };
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -119,6 +131,32 @@ class _SectionHeader extends StatelessWidget {
           fontWeight: FontWeight.w700,
           letterSpacing: 1,
           color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+}
+
+/// A setting the brief calls for that isn't implemented yet — shown
+/// disabled with an explicit "Coming soon" label rather than as a toggle
+/// that looks functional but does nothing.
+class _ComingSoonTile extends StatelessWidget {
+  const _ComingSoonTile({required this.title, required this.subtitle});
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: 0.5,
+      child: ListTile(
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(color: AppColors.surfaceContainerHigh, borderRadius: BorderRadius.circular(3)),
+          child: const Text('COMING SOON',
+              style: TextStyle(fontFamily: 'JetBrains Mono', fontSize: 9, color: AppColors.onSurfaceVariant)),
         ),
       ),
     );

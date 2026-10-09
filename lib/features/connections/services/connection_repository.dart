@@ -124,6 +124,13 @@ class PersistentConnectionRepository extends ChangeNotifier implements Connectio
     _load();
   }
 
+  // NOTE (ServerKit → ServerDr rename): deliberately NOT renamed to
+  // 'serverdr.*'. These are invisible SharedPreferences keys, not
+  // user-facing branding — renaming them would silently wipe every
+  // existing beta user's saved server list on upgrade, for zero visible
+  // benefit. Same reasoning applies to every other `serverkit.*` storage
+  // key in this codebase (monitoring config, command favorites/recent,
+  // theme/font settings).
   static const _storageKey = 'serverkit.connections.v1';
   static const _activeIdKey = 'serverkit.connections.activeId';
 

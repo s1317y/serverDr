@@ -6,12 +6,15 @@ import 'package:provider/provider.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../../core/errors/app_failure.dart';
+import '../../../core/models/connection_status.dart';
 import '../../../core/widgets/app_top_bar.dart';
 import '../../../core/widgets/server_connection_sheet.dart';
 import '../../../core/widgets/error_state_view.dart';
 import '../../../core/widgets/text_prompt_dialog.dart';
 import '../../connections/models/connection_profile.dart';
+import '../../connections/models/server_connection_state.dart';
 import '../../connections/services/connection_repository.dart';
+import '../../connections/services/server_connection_manager.dart';
 import '../../ftp/widgets/unencrypted_ftp_warning.dart';
 import '../../ssh/widgets/host_key_verification_dialog.dart';
 import '../../transfers/models/transfer_item.dart';
@@ -47,7 +50,19 @@ class _SftpScreenState extends State<SftpScreen> {
     final active = context.watch<ConnectionRepository>().activeConnection;
     if (active != null && active.id != _loadedForConnectionId) {
       _loadedForConnectionId = active.id;
-      _connectAndLoad(active);
+      // Reattach silently if this profile's SFTP connection is already
+      // live (e.g. left connected from a previous visit) — otherwise
+      // show the explicit Connect prompt. Never auto-connect just from
+      // opening this tab — see ServerConnectionManager's doc.
+      final sftp = context.read<SftpService>();
+      if (sftp.status == ConnectionStatus.connected) {
+        _load(_currentPath);
+      } else {
+        setState(() {
+          _directory = null;
+          _failure = null;
+        });
+      }
     }
   }
 
@@ -58,14 +73,18 @@ class _SftpScreenState extends State<SftpScreen> {
       if (!proceed) return;
     }
     final service = context.read<SftpService>();
+    final manager = context.read<ServerConnectionManager>();
     setState(() {
       _loading = true;
       _failure = null;
     });
+    manager.reportExternalState(profile.id, ServerConnectionState.connecting);
     try {
       await service.connect(profile, onHostKeyVerification: (request) => showHostKeyVerificationDialog(context, request));
+      manager.reportExternalState(profile.id, ServerConnectionState.connected);
       await _load(_currentPath);
     } on AppFailure catch (f) {
+      manager.reportExternalState(profile.id, ServerConnectionState.connectionFailed, error: f);
       setState(() {
         _failure = f;
         _loading = false;
@@ -110,6 +129,9 @@ class _SftpScreenState extends State<SftpScreen> {
     _load('/$target');
   }
 
+  /// Row tap: navigate into directories, show the file action sheet for
+  /// files. Kept separate from [_onRowMore] — see that method's doc for
+  /// why (this was the source of the three-dot bug).
   Future<void> _openEntry(RemoteFile entry) async {
     if (entry.isDirectory) {
       _load(entry.path);
@@ -117,6 +139,27 @@ class _SftpScreenState extends State<SftpScreen> {
     }
     final action = await showFileActionSheet(context, entry);
     if (action == null || !mounted) return;
+    await _handleFileAction(entry, action);
+  }
+
+  /// Three-dot button: ALWAYS shows an action menu, for both files and
+  /// directories — it must never navigate into a directory. This was the
+  /// actual bug: the three-dot button was previously wired to the same
+  /// handler as the row tap ([_openEntry]), which for a directory just
+  /// called `_load(entry.path)` and skipped the menu entirely.
+  Future<void> _onRowMore(RemoteFile entry) async {
+    if (entry.isDirectory) {
+      final action = await showDirectoryActionSheet(context, entry);
+      if (action == null || !mounted) return;
+      await _handleDirectoryAction(entry, action);
+    } else {
+      final action = await showFileActionSheet(context, entry);
+      if (action == null || !mounted) return;
+      await _handleFileAction(entry, action);
+    }
+  }
+
+  Future<void> _handleFileAction(RemoteFile entry, FileAction action) async {
     switch (action) {
       case FileAction.edit:
         context.push('/editor', extra: entry);
@@ -141,12 +184,90 @@ class _SftpScreenState extends State<SftpScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Copied: ${entry.path}')));
         }
+      case FileAction.properties:
+        _showProperties(entry);
       case FileAction.permissions:
       case FileAction.newFolder:
       case FileAction.newFile:
       case FileAction.refresh:
+      case FileAction.open:
         break;
     }
+  }
+
+  Future<void> _handleDirectoryAction(RemoteFile entry, FileAction action) async {
+    switch (action) {
+      case FileAction.open:
+        _load(entry.path);
+      case FileAction.newFolder:
+        final name = await showTextPromptDialog(context, title: 'New Folder');
+        if (name != null) {
+          await context.read<SftpService>().createFolder(entry.path, name);
+          if (_currentPath == entry.path) _load(_currentPath);
+        }
+      case FileAction.upload:
+        await _uploadFile(targetDirectory: entry.path);
+      case FileAction.rename:
+        final name = await showTextPromptDialog(context, title: 'Rename', initialValue: entry.name, confirmLabel: 'Rename');
+        if (name != null) {
+          await context.read<SftpService>().rename(entry.path, name);
+          _load(_currentPath);
+        }
+      case FileAction.copyPath:
+        await Clipboard.setData(ClipboardData(text: entry.path));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Copied: ${entry.path}')));
+        }
+      case FileAction.properties:
+        _showProperties(entry);
+      case FileAction.delete:
+        final confirmed = await _confirmDelete(entry.name);
+        if (confirmed) {
+          await context.read<SftpService>().delete(entry.path);
+          _load(_currentPath);
+        }
+      case FileAction.edit:
+      case FileAction.download:
+      case FileAction.permissions:
+      case FileAction.newFile:
+      case FileAction.refresh:
+        break;
+    }
+  }
+
+  void _showProperties(RemoteFile entry) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(entry.name),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _propertyRow('Path', entry.path),
+            _propertyRow('Type', entry.isDirectory ? 'Directory' : 'File'),
+            _propertyRow('Permissions', entry.permissions),
+            if (!entry.isDirectory) _propertyRow('Size', '${entry.sizeBytes ?? 0} bytes'),
+            if (entry.isDirectory && entry.itemCount != null) _propertyRow('Items', '${entry.itemCount}'),
+            _propertyRow('Modified', entry.modifiedAt.toLocal().toString().split('.').first),
+          ],
+        ),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
+      ),
+    );
+  }
+
+  Widget _propertyRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 90, child: Text(label, style: const TextStyle(fontFamily: 'Geist', fontSize: 12, color: AppColors.onSurfaceVariant))),
+          Expanded(child: Text(value, style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12))),
+        ],
+      ),
+    );
   }
 
   Future<bool> _confirmDelete(String name) async {
@@ -207,13 +328,14 @@ class _SftpScreenState extends State<SftpScreen> {
     }
   }
 
-  Future<void> _uploadFile() async {
+  Future<void> _uploadFile({String? targetDirectory}) async {
     final files = await FilePicker.pickFiles();
     if (files.isEmpty || !mounted) return;
     final file = files.first;
     final bytes = await file.readAsBytes();
 
-    final remotePath = _currentPath == '/' ? '/${file.name}' : '$_currentPath/${file.name}';
+    final destination = targetDirectory ?? _currentPath;
+    final remotePath = destination == '/' ? '/${file.name}' : '$destination/${file.name}';
     final transferManager = context.read<TransferManager>();
     final id = transferManager.registerExternalTransfer(
       filename: file.name,
@@ -227,7 +349,7 @@ class _SftpScreenState extends State<SftpScreen> {
             onProgress: (transferred, total) => transferManager.updateProgress(id, transferred),
           );
       transferManager.completeTransfer(id);
-      _load(_currentPath);
+      if (destination == _currentPath) _load(_currentPath);
     } on AppFailure catch (f) {
       transferManager.failTransfer(id, f.title);
       if (mounted) {
@@ -295,7 +417,32 @@ class _SftpScreenState extends State<SftpScreen> {
       return const LoadingStateView(label: 'Loading directory...');
     }
     final dir = _directory;
-    if (dir == null) return const SizedBox.shrink();
+    if (dir == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.folder_outlined, size: 40, color: AppColors.outline),
+              const SizedBox(height: 12),
+              const Text('Not connected', style: TextStyle(fontFamily: 'Geist', fontSize: 15, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 4),
+              Text(
+                '${active.username}@${active.host}:${active.port}',
+                style: const TextStyle(fontFamily: 'JetBrains Mono', fontSize: 12, color: AppColors.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () => _connectAndLoad(active),
+                icon: const Icon(Icons.power_settings_new, size: 18),
+                label: const Text('Connect'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final entries = _filterController.text.isEmpty
         ? dir.entries
@@ -344,7 +491,7 @@ class _SftpScreenState extends State<SftpScreen> {
                       entry: entry,
                       selected: false,
                       onTap: () => _openEntry(entry),
-                      onMore: () => _openEntry(entry),
+                      onMore: () => _onRowMore(entry),
                     );
                   },
                 ),

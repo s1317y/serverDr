@@ -252,10 +252,35 @@ class RealSftpService implements SftpService {
   Future<void> delete(String path) async {
     final sftp = _requireSftp();
     try {
-      await sftp.remove(path);
+      // SFTP's `remove` (SSH_FXP_REMOVE) only works on regular files —
+      // this was the folder-delete bug: it was called unconditionally
+      // for both files and directories, and silently/erroneously failed
+      // for directories. Directories need `rmdir` (SSH_FXP_RMDIR), which
+      // itself only works when EMPTY, so a non-empty directory must have
+      // its contents removed recursively first.
+      final stat = await sftp.stat(path);
+      if (stat.isDirectory) {
+        await _deleteDirectoryRecursive(sftp, path);
+      } else {
+        await sftp.remove(path);
+      }
     } on SftpStatusError catch (e) {
       throw _mapSftpStatusError(e);
     }
+  }
+
+  Future<void> _deleteDirectoryRecursive(SftpClient sftp, String path) async {
+    final entries = await sftp.listdir(path);
+    for (final entry in entries) {
+      if (entry.filename == '.' || entry.filename == '..') continue;
+      final childPath = path == '/' ? '/${entry.filename}' : '$path/${entry.filename}';
+      if (entry.attr.isDirectory) {
+        await _deleteDirectoryRecursive(sftp, childPath);
+      } else {
+        await sftp.remove(childPath);
+      }
+    }
+    await sftp.rmdir(path);
   }
 
   @override

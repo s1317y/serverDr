@@ -69,3 +69,57 @@ abstract final class AppColors {
   // Backdrop scrim for modal sheets ("#010409" at 70%)
   static const scrim = Color(0xB3010409);
 }
+
+/// Light-theme counterpart to [AppColors].
+///
+/// IMPORTANT SCOPE NOTE: this powers `AppTheme.light`'s `ColorScheme` and
+/// component themes (AppBar, Card, Dialog, NavigationBar, inputs,
+/// buttons) — those genuinely repaint in light mode. However, the large
+/// majority of ServerDr's screens reference [AppColors]'s dark palette
+/// as `static const` values DIRECTLY (e.g. `AppColors.surfaceContainer`
+/// inside a `Container`'s `decoration`), not via `Theme.of(context)`.
+/// Those custom-styled surfaces — which is most of the Stitch-matched
+/// visual design — will NOT switch to this palette yet. Converting every
+/// such call site to a context-aware lookup is a large, separate
+/// mechanical pass (constant-expression removal across ~90 files) that
+/// hasn't been done. Light mode today correctly affects standard
+/// Material chrome and leaves custom surfaces dark; that's a known,
+/// tracked gap, not a silent one.
+abstract final class AppColorsLight {
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceDim = Color(0xFFF5F6F8);
+  static const surfaceBright = Color(0xFFFFFFFF);
+  static const surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const surfaceContainerLow = Color(0xFFF7F8FA);
+  static const surfaceContainer = Color(0xFFF1F2F5);
+  static const surfaceContainerHigh = Color(0xFFE9EBEF);
+  static const surfaceContainerHighest = Color(0xFFE1E4E9);
+  static const surfaceVariant = Color(0xFFE1E4E9);
+
+  static const onSurface = Color(0xFF1A1D21);
+  static const onSurfaceVariant = Color(0xFF44494F);
+  static const outline = Color(0xFF767B82);
+  static const outlineVariant = Color(0xFFD2D6DB);
+
+  static const primary = Color(0xFF0060AA);
+  static const onPrimary = Color(0xFFFFFFFF);
+  static const primaryContainer = Color(0xFF58A6FF);
+  static const onPrimaryContainer = Color(0xFF00253F);
+
+  static const secondary = Color(0xFF1E7B2E);
+  static const onSecondary = Color(0xFFFFFFFF);
+  static const secondaryContainer = Color(0xFF27A640);
+  static const onSecondaryContainer = Color(0xFF00230A);
+
+  static const tertiary = Color(0xFF8A5B00);
+  static const onTertiary = Color(0xFFFFFFFF);
+  static const tertiaryContainer = Color(0xFFD29922);
+  static const onTertiaryContainer = Color(0xFF2E1F00);
+
+  static const error = Color(0xFFBA1A1A);
+  static const onError = Color(0xFFFFFFFF);
+  static const errorContainer = Color(0xFFFFDAD6);
+  static const onErrorContainer = Color(0xFF410002);
+
+  static const scrim = Color(0x66000000);
+}

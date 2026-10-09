@@ -7,7 +7,10 @@ import '../features/browser/screens/web_browser_screen.dart';
 import '../features/connections/screens/connection_editor_screen.dart';
 import '../features/connections/screens/connections_screen.dart';
 import '../features/editor/screens/editor_screen.dart';
-import '../features/health/screens/health_screen.dart';
+import '../features/health/screens/health_active_screen.dart';
+import '../features/health/screens/health_detail_screen.dart';
+import '../features/health/screens/health_overview_screen.dart';
+import '../features/health/screens/monitoring_settings_screen.dart';
 import '../features/security/screens/security_screen.dart';
 import '../features/settings/screens/known_hosts_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
@@ -35,29 +38,23 @@ final GoRouter appRouter = GoRouter(
           GoRoute(path: '/web', builder: (context, state) => const WebBrowserScreen()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/health', builder: (context, state) => const HealthScreen()),
+          // HEALTH tab = single active-server detail, auto-loads on open —
+          // see HealthActiveScreen's doc. Distinct from MONITOR below.
+          GoRoute(path: '/health', builder: (context, state) => const HealthActiveScreen()),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(path: '/security', builder: (context, state) => const SecurityScreen()),
         ]),
         StatefulShellBranch(routes: [
-          GoRoute(path: '/transfers', builder: (context, state) => const TransfersScreen()),
+          // MONITOR tab = multi-server "Live Servers" dashboard with its
+          // own explicit per-server opt-in (HealthOverviewScreen).
+          GoRoute(path: '/monitor', builder: (context, state) => const HealthOverviewScreen()),
         ]),
       ],
     ),
-    // Settings is no longer a bottom-nav tab (6 tabs already fill the bar
-    // once Health/Security were added) — reached via the profile avatar
-    // in the top bar instead. See AppShell's doc.
-    GoRoute(
-      path: '/settings',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => const SettingsScreen(),
-    ),
-    GoRoute(
-      path: '/settings/known-hosts',
-      parentNavigatorKey: rootNavigatorKey,
-      builder: (context, state) => const KnownHostsScreen(),
-    ),
+    // Connections and Transfers are reached from the top bar (connection
+    // pill / transfers icon), not bottom-nav destinations — always pushed
+    // full-screen over whichever tab is active.
     GoRoute(
       path: '/connections',
       parentNavigatorKey: rootNavigatorKey,
@@ -72,6 +69,33 @@ final GoRouter appRouter = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/transfers',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const TransfersScreen(),
+    ),
+    GoRoute(
+      path: '/health/:id',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => HealthDetailScreen(profileId: state.pathParameters['id']!),
+      routes: [
+        GoRoute(
+          path: 'settings',
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => MonitoringSettingsScreen(profileId: state.pathParameters['id']!),
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/settings',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/settings/known-hosts',
+      parentNavigatorKey: rootNavigatorKey,
+      builder: (context, state) => const KnownHostsScreen(),
     ),
     GoRoute(
       path: '/editor',

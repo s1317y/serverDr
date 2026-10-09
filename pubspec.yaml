@@ -1,8 +1,6 @@
-name: serverkit
+name: serverdr
 description: >
-  ServerKit — a lightweight professional IT support and server administration
-  app. SSH terminal, SFTP/FTP file management, remote editing, and a web
-  browser tab, connecting directly from the device to remote infrastructure.
+  ServerDr — mobile server administration, monitoring and security tool.
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -14,103 +12,42 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
 
-  # Navigation: declarative router, handles the bottom-nav shell plus
-  # nested per-server routes (ssh/files/web) without hand-rolled Navigator
-  # stacks.
   go_router: ^14.2.0
-
-  # State management: ChangeNotifier + Provider. Chosen for Phase 1 because
-  # it is the lightest option that still gives clean dependency injection —
-  # every feature depends on a *Service interface*, and main.dart is the
-  # only place that decides whether the mock or (later) real implementation
-  # gets wired in. No code generation required.
   provider: ^6.1.2
-
-  # --- Real networking (this phase) ---
-
-  # SSH + SFTP client, pure Dart (no native platform code, so Android/iOS/
-  # desktop all work identically; NOT available on Flutter Web because it
-  # opens real TCP sockets via dart:io, which browsers cannot do — this
-  # matches the original brief's requirement that Web stay behind an
-  # interface). Actively maintained by terminal.studio (same publisher as
-  # the `xterm` package below, and the two are designed to be used
-  # together). Chosen over alternatives because it's the only actively
-  # maintained pure-Dart SSHv2 implementation with both an interactive
-  # shell/pty API and a full SFTPv3 client built in — using one library
-  # for both avoids a second, differently-shaped SSH stack just for SFTP.
-  # Known limitation: no SSH agent forwarding, no FTP/FTPS (unrelated
-  # protocol, unchanged — still mocked per the phase boundary).
   dartssh2: ^2.12.0
-
-  # Real terminal emulator widget (ANSI/VT100 escape sequences, cursor
-  # addressing, scrollback) — from the same publisher as dartssh2 and
-  # explicitly designed to consume an SSH shell's raw byte stream. Writing
-  # a correct ANSI parser from scratch is out of scope for this phase;
-  # this is the standard pairing for "real interactive terminal" in the
-  # Flutter ecosystem. Android/iOS/desktop; not meaningfully applicable to
-  # Web for the same reason as dartssh2.
   xterm: ^4.0.0
-
-  # Secure, platform-backed credential storage — Android Keystore-backed
-  # (EncryptedSharedPreferences under the hood) on Android, Keychain on
-  # iOS. Verified publisher, large adoption, actively maintained. This is
-  # the standard choice for "don't store secrets in SharedPreferences" on
-  # Flutter; there is no first-party alternative from the Flutter team.
-  # Known limitation: value size limits on very old Android versions
-  # (irrelevant here — we store short strings/PEM text, not binaries).
   flutter_secure_storage: 11.1.0
-
-  # Android Storage Access Framework file picker, so the user selects a
-  # private key file (id_ed25519, id_rsa, ...) through the system picker
-  # rather than pasting key text — no broad storage permission required.
-  # Actively maintained, the de facto standard file-picker package for
-  # Flutter. Android/iOS/desktop/web support; only Android matters here.
-  # 12.x supports Flutter's Built-in Kotlin integration and inherits its
-  # compileSdk, avoiding the legacy Android plugin configuration.
   file_picker: ^12.2.0
-
-  # Persists the saved-connection LIST (host, port, username, protocol —
-  # never secrets, which stay in flutter_secure_storage). Plain key-value
-  # storage is fine for this: it's not sensitive, and it's the Flutter
-  # team's own recommended package for exactly this kind of small
-  # structured local state.
   shared_preferences: ^2.3.2
+  webview_flutter: ^4.10.0
+  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
 
+  # Generates real Android/iOS launcher icons from the ServerDr mark
+  # (assets/icon/icon.png, assets/icon/icon_foreground.png) instead of
+  # the default Flutter icon. Run after `flutter pub get`:
+  #   dart run flutter_launcher_icons
+  # Rewrites files under android/app/src/main/res/mipmap-*/ and
+  # ios/Runner/Assets.xcassets/ — safe to re-run any time the source
+  # images change.
+  flutter_launcher_icons: ^0.14.3
+
 flutter:
   uses-material-design: true
+  # fonts: intentionally omitted — see project README for why and how to add them.
 
-  # IMPORTANT: intentionally left with no `fonts:` block for Phase 1.
-  # Flutter's build step verifies that every asset declared here actually
-  # exists on disk and fails the build otherwise — and this repo does not
-  # ship the Geist / JetBrains Mono binaries (proprietary/redistribution
-  # concerns aside, this sandbox has no way to fetch them). The code
-  # already references the family names 'Geist' and 'JetBrains Mono'
-  # (see lib/app/theme/app_typography.dart); Flutter falls back to the
-  # platform default typeface silently when a named family isn't
-  # registered, so the app builds and runs correctly as-is.
-  #
-  # To enable the real typefaces: download the ttf files, place them
-  # under assets/fonts/ (folder already created), then uncomment/add:
-  #
-  # fonts:
-  #   - family: Geist
-  #     fonts:
-  #       - asset: assets/fonts/Geist-Regular.ttf
-  #         weight: 400
-  #       - asset: assets/fonts/Geist-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/Geist-SemiBold.ttf
-  #         weight: 600
-  #   - family: JetBrains Mono
-  #     fonts:
-  #       - asset: assets/fonts/JetBrainsMono-Regular.ttf
-  #         weight: 400
-  #       - asset: assets/fonts/JetBrainsMono-Medium.ttf
-  #         weight: 500
-  #       - asset: assets/fonts/JetBrainsMono-SemiBold.ttf
-  #         weight: 600
+  assets:
+    - assets/icon/icon.png
+    - assets/icon/icon_foreground.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#0B141C"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  min_sdk_android: 21
